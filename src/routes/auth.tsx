@@ -182,7 +182,10 @@ function AuthPage() {
       {mode === "login" && (
         <button
           onClick={async () => {
-            if (!form.email.trim()) return toast.error("Renseignez votre e-mail d'abord");
+            if (!form.email.trim()) {
+              toast.error("Renseignez votre e-mail d'abord");
+              return;
+            }
             const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
               redirectTo: `${window.location.origin}/reset-password`,
             });
