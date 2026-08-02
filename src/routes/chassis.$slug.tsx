@@ -177,8 +177,8 @@ function ChassisPage() {
                 Chaque châssis du registre est documenté à partir d'archives d'usine, de la presse
                 d'époque et des témoignages de propriétaires successifs.
               </p>
-              <Link to="/expert" className="mt-3 inline-block eyebrow text-primary hover:underline">
-                L'expertise du registre →
+              <Link to="/fondateur" className="mt-3 inline-block eyebrow text-primary hover:underline">
+                Le registre & son fondateur →
               </Link>
             </aside>
           </div>
