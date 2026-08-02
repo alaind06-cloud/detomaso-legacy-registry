@@ -11,16 +11,25 @@ async function unwrap<T>(p: PromiseLike<{ data: T | null; error: { message: stri
 
 export const voituresQuery = queryOptions({
   queryKey: ["voitures", BRAND_SLUG],
-  queryFn: () =>
-    unwrap<Voiture[]>(
+  queryFn: async () => {
+    const rows = await unwrap<Voiture[]>(
       supabase
         .from("voitures")
         .select("*")
         .eq("marque", BRAND_SLUG)
         .order("ordre_affichage", { ascending: true, nullsFirst: false })
         .order("id", { ascending: true }),
-    ),
+    );
+    // Ordre de référence du site historique en priorité, puis ordre_affichage / id.
+    return [...rows].sort(
+      (a, b) =>
+        referenceRank(a.slug) - referenceRank(b.slug) ||
+        (a.ordre_affichage ?? Number.MAX_SAFE_INTEGER) - (b.ordre_affichage ?? Number.MAX_SAFE_INTEGER) ||
+        a.id - b.id,
+    );
+  },
 });
+
 
 export const marqueQuery = queryOptions({
   queryKey: ["marque", BRAND_SLUG],
