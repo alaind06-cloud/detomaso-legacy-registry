@@ -23,12 +23,14 @@ export const voituresQuery = queryOptions({
         .order("id", { ascending: true }),
     );
     // Ordre de référence du site historique en priorité, puis ordre_affichage / id.
-    return [...rows].sort(
-      (a, b) =>
-        referenceRank(a.slug) - referenceRank(b.slug) ||
-        (a.ordre_affichage ?? Number.MAX_SAFE_INTEGER) - (b.ordre_affichage ?? Number.MAX_SAFE_INTEGER) ||
-        a.id - b.id,
-    );
+    return rows
+      .filter((r) => !HIDDEN_SLUGS.has((r.slug ?? "").toLowerCase()))
+      .sort(
+        (a, b) =>
+          referenceRank(a.slug) - referenceRank(b.slug) ||
+          (a.ordre_affichage ?? Number.MAX_SAFE_INTEGER) - (b.ordre_affichage ?? Number.MAX_SAFE_INTEGER) ||
+          a.id - b.id,
+      );
   },
 });
 
