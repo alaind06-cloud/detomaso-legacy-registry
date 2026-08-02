@@ -1,14 +1,17 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Lock, X, ZoomIn } from "lucide-react";
-import { detailsQuery, photosQuery, voitureBySlugQuery } from "@/lib/data";
+import { detailsQuery, photosQuery, voitureBySlugQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
 import { BRAND, LANG_LABELS, LANGS, type Lang } from "@/lib/brand";
+import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import type { Voiture } from "@/lib/types";
 
 export const Route = createFileRoute("/chassis/$slug")({
+  validateSearch: parseRegistrySearch,
   head: ({ params }) => {
     const url = `${BRAND.siteUrl}/chassis/${params.slug}`;
     return {
@@ -30,6 +33,7 @@ export const Route = createFileRoute("/chassis/$slug")({
   },
   component: ChassisPage,
 });
+
 
 function ChassisPage() {
   const { slug } = Route.useParams();
