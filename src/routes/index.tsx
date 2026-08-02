@@ -124,34 +124,33 @@ function Home() {
       <section className="relative isolate overflow-hidden border-b border-border">
         <img
           src={heroImage}
-          alt="Automobile De Tomaso dans un atelier de Modène"
+          alt={t("home.heroAlt")}
           width={1920}
           height={1088}
           className="absolute inset-0 size-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/20" />
         <div className="relative mx-auto max-w-7xl px-5 py-28 sm:py-36">
-          <p className="eyebrow">Modena · Depuis 1959</p>
+          <p className="eyebrow">{t("home.eyebrow")}</p>
           <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] sm:text-7xl">
-            Chaque châssis De&nbsp;Tomaso a une histoire.
-            <span className="block text-primary">Nous la documentons.</span>
+            {t("home.title1")}
+            <span className="block text-primary">{t("home.title2")}</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Un recensement indépendant, châssis par châssis, des automobiles nées de la vision
-            d'Alejandro de Tomaso — Vallelunga, Mangusta, Pantera, Deauville, Longchamp.
+            {t("home.intro")}
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <a
               href="#registre"
               className="bg-primary px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground"
             >
-              Consulter le registre
+              {t("home.cta.browse")}
             </a>
             <Link
               to="/auth"
               className="border border-foreground/25 px-7 py-3.5 text-xs uppercase tracking-[0.2em] hover:bg-accent"
             >
-              Devenir membre
+              {t("home.cta.join")}
             </Link>
           </div>
         </div>
@@ -159,12 +158,12 @@ function Home() {
 
       <section id="registre" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-16">
         <div className="border-b border-border pb-8">
-          <p className="eyebrow">Le registre</p>
-          <h2 className="mt-2 font-display text-3xl">Rechercher un châssis</h2>
+          <p className="eyebrow">{t("home.registry.eyebrow")}</p>
+          <h2 className="mt-2 font-display text-3xl">{t("home.registry.title")}</h2>
 
           <div className="mt-8 max-w-md">
             <label htmlFor="registry-search" className="eyebrow mb-2 block">
-              Recherche
+              {t("home.search.label")}
             </label>
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -172,17 +171,17 @@ function Home() {
                 id="registry-search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="N° de châssis, modèle, année…"
+                placeholder={t("home.search.placeholder")}
                 className="h-11 w-full border border-input bg-card pr-3 pl-9 text-sm outline-none focus:border-primary"
               />
             </div>
           </div>
 
           <div className="mt-8">
-            <span className="eyebrow mb-3 block">Modèle</span>
+            <span className="eyebrow mb-3 block">{t("home.model")}</span>
             <div className="flex flex-wrap gap-2">
               <FilterChip active={modele === "all"} onClick={() => setModele("all")}>
-                Tous
+                {t("home.allModels")}
               </FilterChip>
               {groups.map((g) => (
                 <FilterChip key={g.key} active={modele === g.key} onClick={() => setModele(g.key)}>
@@ -195,10 +194,10 @@ function Home() {
 
           {decennies.length > 1 && (
             <div className="mt-6">
-              <span className="eyebrow mb-3 block">Décennie</span>
+              <span className="eyebrow mb-3 block">{t("home.decade")}</span>
               <div className="flex flex-wrap gap-2">
                 <FilterChip active={decennie === "all"} onClick={() => setDecennie("all")}>
-                  Toutes
+                  {t("home.allDecades")}
                 </FilterChip>
                 {decennies.map((d) => (
                   <FilterChip
@@ -218,20 +217,22 @@ function Home() {
             <p className="eyebrow ml-auto" aria-live="polite" aria-atomic="true">
               {isLoading
                 ? "…"
-                : `${filtered.length} châssis référencé${filtered.length > 1 ? "s" : ""}`}
+                : t(filtered.length > 1 ? "home.count.other" : "home.count.one", {
+                    n: filtered.length,
+                  })}
             </p>
           </div>
         </div>
 
         {error && (
           <p className="mt-10 border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
-            Impossible de charger le registre : {(error as Error).message}
+            {t("home.error")} {(error as Error).message}
           </p>
         )}
 
         {!isLoading && totalPages > 1 && (
           <p className="mt-6 text-right eyebrow">
-            Page {currentPage} / {totalPages}
+            {t("home.page")} {currentPage} / {totalPages}
           </p>
         )}
 
@@ -245,26 +246,24 @@ function Home() {
 
         {!isLoading && filtered.length === 0 && !error && (
           <div className="mt-16 text-center">
-            <p className="text-sm text-muted-foreground">
-              Aucun châssis ne correspond à cette recherche.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("home.empty")}</p>
             <button
               onClick={() => navigate({ search: {}, replace: true, resetScroll: false })}
               className="mt-4 border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] hover:bg-accent"
             >
-              Réinitialiser les filtres
+              {t("home.reset")}
             </button>
           </div>
         )}
 
         {!isLoading && totalPages > 1 && (
-          <nav className="mt-12 flex items-center justify-center gap-3" aria-label="Pagination">
+          <nav className="mt-12 flex items-center justify-center gap-3" aria-label={t("common.pagination")}>
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
               className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent disabled:opacity-40"
             >
-              Précédent
+              {t("common.prev")}
             </button>
             <span className="px-2 font-mono text-sm text-muted-foreground">
               {currentPage} / {totalPages}
@@ -274,10 +273,11 @@ function Home() {
               disabled={currentPage === totalPages}
               className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent disabled:opacity-40"
             >
-              Suivant
+              {t("common.next")}
             </button>
           </nav>
         )}
+
       </section>
     </>
   );
