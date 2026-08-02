@@ -17,26 +17,27 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { BRAND } from "@/lib/brand";
+import { I18nProvider, useT } from "@/lib/i18n";
 
 function NotFoundComponent() {
+  const t = useT();
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="eyebrow">Erreur 404</p>
-        <h1 className="mt-3 font-display text-4xl">Châssis introuvable</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Cette page n'existe pas ou a été déplacée.
-        </p>
+        <p className="eyebrow">{t("notFound.eyebrow")}</p>
+        <h1 className="mt-3 font-display text-4xl">{t("notFound.title")}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{t("notFound.text")}</p>
         <Link
           to="/"
           className="mt-8 inline-flex bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground"
         >
-          Retour au registre
+          {t("notFound.cta")}
         </Link>
       </div>
     </div>
   );
 }
+
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
