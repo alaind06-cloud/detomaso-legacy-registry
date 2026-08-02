@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FondateurRouteImport } from './routes/fondateur'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const FondateurRoute = FondateurRouteImport.update({
   path: '/fondateur',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChassisSlugRoute = ChassisSlugRouteImport.update({
   id: '/chassis/$slug',
   path: '/chassis/$slug',
@@ -32,30 +38,34 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fondateur': typeof FondateurRoute
+  '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fondateur': typeof FondateurRoute
+  '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fondateur': typeof FondateurRoute
+  '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/fondateur' | '/chassis/$slug'
+  fullPaths: '/' | '/fondateur' | '/videos' | '/chassis/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/fondateur' | '/chassis/$slug'
-  id: '__root__' | '/' | '/fondateur' | '/chassis/$slug'
+  to: '/' | '/fondateur' | '/videos' | '/chassis/$slug'
+  id: '__root__' | '/' | '/fondateur' | '/videos' | '/chassis/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FondateurRoute: typeof FondateurRoute
+  VideosRoute: typeof VideosRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FondateurRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chassis/$slug': {
       id: '/chassis/$slug'
       path: '/chassis/$slug'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FondateurRoute: FondateurRoute,
+  VideosRoute: VideosRoute,
   ChassisSlugRoute: ChassisSlugRoute,
 }
 export const routeTree = rootRouteImport
