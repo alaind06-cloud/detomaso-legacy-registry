@@ -353,6 +353,7 @@ function Pager({
   filters: ReturnType<typeof Route.useSearch>;
   wide?: boolean;
 }) {
+  const t = useT();
   if (!prev && !next) return null;
   const base =
     "inline-flex max-w-[45vw] items-center gap-2 border border-border px-4 py-2 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-primary hover:text-primary";
@@ -360,32 +361,37 @@ function Pager({
 
   return (
     <nav
-      aria-label="Navigation entre châssis"
+      aria-label={t("chassis.nav")}
       className={cn("flex flex-wrap items-center gap-3", wide ? "justify-between" : "justify-end")}
     >
       {prev ? (
         <Link to="/chassis/$slug" params={{ slug: prev.slug }} search={filters} className={base}>
           <ChevronLeft className="size-3.5 shrink-0" />
-          <span className="truncate">{wide ? `Précédent · ${label(prev)}` : label(prev)}</span>
+          <span className="truncate">
+            {wide ? `${t("common.prev")} · ${label(prev)}` : label(prev)}
+          </span>
         </Link>
       ) : (
         <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
           <ChevronLeft className="size-3.5" />
-          <span>Précédent</span>
+          <span>{t("common.prev")}</span>
         </span>
       )}
       {next ? (
         <Link to="/chassis/$slug" params={{ slug: next.slug }} search={filters} className={base}>
-          <span className="truncate">{wide ? `Suivant · ${label(next)}` : label(next)}</span>
+          <span className="truncate">
+            {wide ? `${t("common.next")} · ${label(next)}` : label(next)}
+          </span>
           <ChevronRight className="size-3.5 shrink-0" />
         </Link>
       ) : (
         <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
-          <span>Suivant</span>
+          <span>{t("common.next")}</span>
           <ChevronRight className="size-3.5" />
         </span>
       )}
     </nav>
+
   );
 }
 
