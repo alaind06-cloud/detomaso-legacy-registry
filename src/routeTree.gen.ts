@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FondateurRouteImport } from './routes/fondateur'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FondateurRoute = FondateurRouteImport.update({
+  id: '/fondateur',
+  path: '/fondateur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChassisSlugRoute = ChassisSlugRouteImport.update({
@@ -25,27 +31,31 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/fondateur': typeof FondateurRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/fondateur': typeof FondateurRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/fondateur': typeof FondateurRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chassis/$slug'
+  fullPaths: '/' | '/fondateur' | '/chassis/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chassis/$slug'
-  id: '__root__' | '/' | '/chassis/$slug'
+  to: '/' | '/fondateur' | '/chassis/$slug'
+  id: '__root__' | '/' | '/fondateur' | '/chassis/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FondateurRoute: typeof FondateurRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fondateur': {
+      id: '/fondateur'
+      path: '/fondateur'
+      fullPath: '/fondateur'
+      preLoaderRoute: typeof FondateurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chassis/$slug': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FondateurRoute: FondateurRoute,
   ChassisSlugRoute: ChassisSlugRoute,
 }
 export const routeTree = rootRouteImport
