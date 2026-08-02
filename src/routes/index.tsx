@@ -177,11 +177,12 @@ function Home() {
               <FilterChip active={modele === "all"} onClick={() => setModele("all")}>
                 Tous
               </FilterChip>
-              {modeles.map((m) => (
-                <FilterChip key={m} active={modele === m} onClick={() => setModele(m)}>
-                  {m}
+              {groups.map((g) => (
+                <FilterChip key={g.key} active={modele === g.key} onClick={() => setModele(g.key)}>
+                  {g.label}
                 </FilterChip>
               ))}
+
             </div>
           </div>
 
