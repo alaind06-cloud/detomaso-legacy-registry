@@ -11,6 +11,9 @@ async function unwrap<T>(p: PromiseLike<{ data: T | null; error: { message: stri
   return (data ?? []) as T;
 }
 
+// Fiche technique interne, jamais affichée dans le registre.
+const HIDDEN_SLUGS = new Set(["00-cover"]);
+
 export const voituresQuery = queryOptions({
   queryKey: ["voitures", BRAND_SLUG],
   queryFn: async () => {
