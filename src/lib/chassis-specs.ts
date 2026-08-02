@@ -77,8 +77,7 @@ const CONDITION_HINTS: Array<[RegExp, string]> = [
 ];
 
 function cleanValue(raw: string): string {
-  let v = raw.trim();
-  v = v.split(/(?:\.\s|\s[-–—]\s|;)/)[0];
+  const v = raw.trim().split(/(?:\.\s|\s[-–—]\s|;)/)[0] ?? raw.trim();
   return v.replace(/^["“”'‘’(]+/, "").replace(/["“”'‘’).,;:\s]+$/g, "").trim();
 }
 
@@ -140,7 +139,8 @@ export function parseHistory(description: string): TimelineEntry[] {
   for (const line of lines) {
     const m = line.match(/^(\d{4})\s*[:\-–]?(?:\s+|$)(.*)/);
     if (m) {
-      current = { year: m[1], events: m[2].trim() ? [toEvent(m[2].trim())] : [] };
+      const rest = (m[2] ?? "").trim();
+      current = { year: m[1] ?? "", events: rest ? [toEvent(rest)] : [] };
       entries.push(current);
       continue;
     }
@@ -151,9 +151,9 @@ export function parseHistory(description: string): TimelineEntry[] {
     }
   }
 
-  if (entries.length > 1 && entries[0].year === "") {
+  if (entries.length > 1 && entries[0]?.year === "") {
     const preamble = entries.shift()!;
-    entries[0].events.unshift(...preamble.events);
+    entries[0]?.events.unshift(...preamble.events);
   }
   return entries;
 }
