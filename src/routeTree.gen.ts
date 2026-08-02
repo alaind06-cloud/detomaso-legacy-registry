@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as FondateurRouteImport } from './routes/fondateur'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
 
@@ -36,6 +37,11 @@ const FondateurRoute = FondateurRouteImport.update({
   path: '/fondateur',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
@@ -69,21 +77,36 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
+    | '/'
+    | '/auth'
+    | '/books'
+    | '/fondateur'
+    | '/reset-password'
+    | '/videos'
+    | '/chassis/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
+  to:
+    | '/'
+    | '/auth'
+    | '/books'
+    | '/fondateur'
+    | '/reset-password'
+    | '/videos'
+    | '/chassis/$slug'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/books'
     | '/fondateur'
+    | '/reset-password'
     | '/videos'
     | '/chassis/$slug'
   fileRoutesById: FileRoutesById
@@ -93,6 +116,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BooksRoute: typeof BooksRoute
   FondateurRoute: typeof FondateurRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   VideosRoute: typeof VideosRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
 }
@@ -127,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FondateurRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/videos': {
       id: '/videos'
       path: '/videos'
@@ -149,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BooksRoute: BooksRoute,
   FondateurRoute: FondateurRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   VideosRoute: VideosRoute,
   ChassisSlugRoute: ChassisSlugRoute,
 }
