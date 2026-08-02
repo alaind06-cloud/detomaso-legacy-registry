@@ -10,7 +10,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-display text-xl tracking-[0.2em] uppercase">{BRAND.name}</p>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">{BRAND.baseline}</p>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">{t("footer.baseline")}</p>
         </div>
         <div>
           <p className="eyebrow">{t("footer.registry")}</p>
