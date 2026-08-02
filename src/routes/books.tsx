@@ -29,6 +29,7 @@ export const Route = createFileRoute("/books")({
 });
 
 function Cover({ book, large = false }: { book: Book; large?: boolean }) {
+  const t = useT();
   return (
     <div
       className={`flex items-center justify-center overflow-hidden border border-border bg-secondary ${
@@ -38,7 +39,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
       {book.couverture_url ? (
         <img
           src={book.couverture_url}
-          alt={`Couverture : ${book.titre}`}
+          alt={`${t("books.cover")} ${book.titre}`}
           loading="lazy"
           className="h-full w-full object-cover"
         />
@@ -50,6 +51,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
     </div>
   );
 }
+
 
 function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
   const content = (
