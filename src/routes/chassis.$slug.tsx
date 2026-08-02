@@ -95,11 +95,14 @@ function ChassisPage() {
     };
   }, [zoom]);
 
-  if (isLoading) return <div className="mx-auto max-w-7xl px-5 py-24 eyebrow">Chargement…</div>;
+  if (isLoading)
+    return <div className="mx-auto max-w-7xl px-5 py-24 eyebrow">{t("common.loading")}</div>;
   if (!voiture) throw notFound();
 
   const current = photos[index];
-  const history = (details?.[`description_${lang}`] ?? details?.description ?? "") as string;
+  // Contenu documentaire d'origine (anglais) : jamais localisé.
+  const history = (details?.description_en ?? details?.description ?? "") as string;
+
   const cover =
     photos.find((p) => p.filename === voiture.cover_photo) ??
     (voiture.cover_photo ? { filename: voiture.cover_photo } : photos[0]);
