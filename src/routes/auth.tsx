@@ -74,7 +74,10 @@ function AuthPage() {
             nom: form.nom.trim(),
             prenom: form.prenom.trim(),
             telephone: form.telephone.trim(),
-            raison: form.raison.trim(),
+            raison:
+              form.raison === "Autre" && form.precision.trim()
+                ? `Autre — ${form.precision.trim()}`
+                : form.raison.trim(),
             statut: "en_attente",
           });
           if (pErr) console.error(pErr);
@@ -160,15 +163,33 @@ function AuthPage() {
           <>
             <Field label="Téléphone" value={form.telephone} onChange={(v) => set("telephone", v)} />
             <label className="block">
-              <span className="eyebrow">Motivation / lien avec la marque</span>
-              <textarea
+              <span className="eyebrow">Raison de la demande</span>
+              <select
                 value={form.raison}
                 onChange={(e) => set("raison", e.target.value)}
-                rows={4}
-                maxLength={1000}
-                className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
-              />
+                required
+                className="mt-2 h-11 w-full border border-input bg-card px-3 text-sm outline-none focus:border-primary"
+              >
+                <option value="">Sélectionnez une option…</option>
+                {RAISONS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
             </label>
+            {form.raison === "Autre" && (
+              <label className="block">
+                <span className="eyebrow">Précisez</span>
+                <textarea
+                  value={form.precision}
+                  onChange={(e) => set("precision", e.target.value)}
+                  rows={4}
+                  maxLength={1000}
+                  className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
+                />
+              </label>
+            )}
           </>
         )}
         <button
