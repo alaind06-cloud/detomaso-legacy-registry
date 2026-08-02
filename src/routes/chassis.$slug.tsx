@@ -299,7 +299,7 @@ function ChassisPage() {
           role="dialog"
           aria-modal="true"
         >
-          <button className="absolute top-5 right-5 text-white" aria-label="Fermer">
+          <button className="absolute top-5 right-5 text-white" aria-label={t("common.close")}>
             <X className="size-6" />
           </button>
           {photos.length > 1 && (
@@ -310,7 +310,7 @@ function ChassisPage() {
                   setIndex((i) => (i - 1 + photos.length) % photos.length);
                 }}
                 className="absolute top-1/2 left-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
-                aria-label="Photo précédente"
+                aria-label={t("chassis.prevPhoto")}
               >
                 <ChevronLeft className="size-8" />
               </button>
@@ -320,7 +320,7 @@ function ChassisPage() {
                   setIndex((i) => (i + 1) % photos.length);
                 }}
                 className="absolute top-1/2 right-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
-                aria-label="Photo suivante"
+                aria-label={t("chassis.nextPhoto")}
               >
                 <ChevronRight className="size-8" />
               </button>
