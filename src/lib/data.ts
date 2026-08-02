@@ -1,6 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_SLUG } from "@/lib/brand";
+import { referenceRank } from "@/lib/order";
+
 import type { Marque, Photo, Profil, Video, Voiture, VoitureDetails } from "@/lib/types";
 
 async function unwrap<T>(p: PromiseLike<{ data: T | null; error: { message: string } | null }>): Promise<T> {
