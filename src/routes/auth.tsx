@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
+import { useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -23,18 +24,20 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const RAISONS = [
-  "Propriétaire d'une De Tomaso",
-  "Ancien propriétaire",
-  "Passionné / collectionneur",
-  "Historien / chercheur",
-  "Professionnel de l'automobile",
-  "Autre",
-] as const;
+/** Valeur stockée en base (FR, invariante) + clé de libellé traduit. */
+const RAISONS: Array<{ value: string; key: TKey }> = [
+  { value: "Propriétaire d'une De Tomaso", key: "auth.reason.owner" },
+  { value: "Ancien propriétaire", key: "auth.reason.former" },
+  { value: "Passionné / collectionneur", key: "auth.reason.enthusiast" },
+  { value: "Historien / chercheur", key: "auth.reason.historian" },
+  { value: "Professionnel de l'automobile", key: "auth.reason.pro" },
+  { value: "Autre", key: "auth.reason.other" },
+];
 
 function AuthPage() {
   const navigate = useNavigate();
   const { user, profil, isMember, refresh } = useAuth();
+  const t = useT();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -67,7 +70,7 @@ function AuthPage() {
         });
         if (error) throw error;
         await refresh();
-        toast.success("Connexion réussie");
+        toast.success(t("auth.toast.loggedIn"));
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: form.email.trim(),
@@ -102,22 +105,16 @@ function AuthPage() {
 
   if (sent) {
     return (
-      <Shell title="Demande enregistrée">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Confirmez votre adresse via le courriel qui vient de vous être envoyé. Votre demande sera
-          ensuite examinée par l'équipe du registre — vous serez averti dès sa validation.
-        </p>
+      <Shell title={t("auth.sent.title")}>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t("auth.sent.text")}</p>
       </Shell>
     );
   }
 
   if (user && profil && !isMember) {
     return (
-      <Shell title="Demande en cours d'examen">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Votre compte est créé mais n'est pas encore validé par un administrateur. Les historiques
-          détaillés des châssis seront accessibles dès validation.
-        </p>
+      <Shell title={t("auth.pending.title")}>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t("auth.pending.text")}</p>
         <button
           onClick={async () => {
             await supabase.auth.signOut();
@@ -125,14 +122,14 @@ function AuthPage() {
           }}
           className="mt-6 border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em]"
         >
-          Se déconnecter
+          {t("auth.signout")}
         </button>
       </Shell>
     );
   }
 
   return (
-    <Shell title={mode === "login" ? "Connexion" : "Demande d'adhésion"}>
+    <Shell title={mode === "login" ? t("auth.login") : t("auth.signup")}>
       <div className="mb-8 flex gap-2">
         {(["login", "signup"] as const).map((m) => (
           <button
@@ -142,7 +139,7 @@ function AuthPage() {
               mode === m ? "border-primary bg-primary text-primary-foreground" : "border-border"
             }`}
           >
-            {m === "login" ? "Se connecter" : "S'inscrire"}
+            {m === "login" ? t("auth.tab.login") : t("auth.tab.signup")}
           </button>
         ))}
       </div>
@@ -150,19 +147,29 @@ function AuthPage() {
       <form onSubmit={submit} className="space-y-4">
         {mode === "signup" && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Prénom" value={form.prenom} onChange={(v) => set("prenom", v)} required />
-            <Field label="Nom" value={form.nom} onChange={(v) => set("nom", v)} required />
+            <Field
+              label={t("auth.firstname")}
+              value={form.prenom}
+              onChange={(v) => set("prenom", v)}
+              required
+            />
+            <Field
+              label={t("auth.lastname")}
+              value={form.nom}
+              onChange={(v) => set("nom", v)}
+              required
+            />
           </div>
         )}
         <Field
-          label="Adresse e-mail"
+          label={t("auth.email")}
           type="email"
           value={form.email}
           onChange={(v) => set("email", v)}
           required
         />
         <Field
-          label="Mot de passe"
+          label={t("auth.password")}
           type="password"
           value={form.password}
           onChange={(v) => set("password", v)}
@@ -170,26 +177,30 @@ function AuthPage() {
         />
         {mode === "signup" && (
           <>
-            <Field label="Téléphone" value={form.telephone} onChange={(v) => set("telephone", v)} />
+            <Field
+              label={t("auth.phone")}
+              value={form.telephone}
+              onChange={(v) => set("telephone", v)}
+            />
             <label className="block">
-              <span className="eyebrow">Raison de la demande</span>
+              <span className="eyebrow">{t("auth.reason")}</span>
               <select
                 value={form.raison}
                 onChange={(e) => set("raison", e.target.value)}
                 required
                 className="mt-2 h-11 w-full border border-input bg-card px-3 text-sm outline-none focus:border-primary"
               >
-                <option value="">Sélectionnez une option…</option>
+                <option value="">{t("auth.reason.placeholder")}</option>
                 {RAISONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
+                  <option key={r.value} value={r.value}>
+                    {t(r.key)}
                   </option>
                 ))}
               </select>
             </label>
             {form.raison === "Autre" && (
               <label className="block">
-                <span className="eyebrow">Précisez</span>
+                <span className="eyebrow">{t("auth.precise")}</span>
                 <textarea
                   value={form.precision}
                   onChange={(e) => set("precision", e.target.value)}
@@ -206,7 +217,7 @@ function AuthPage() {
           disabled={busy}
           className="w-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground disabled:opacity-60"
         >
-          {busy ? "…" : mode === "login" ? "Entrer" : "Envoyer la demande"}
+          {busy ? "…" : mode === "login" ? t("auth.submit.login") : t("auth.submit.signup")}
         </button>
       </form>
 
@@ -214,18 +225,18 @@ function AuthPage() {
         <button
           onClick={async () => {
             if (!form.email.trim()) {
-              toast.error("Renseignez votre e-mail d'abord");
+              toast.error(t("auth.toast.needEmail"));
               return;
             }
             const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
               redirectTo: `${window.location.origin}/reset-password`,
             });
             if (error) toast.error(error.message);
-            else toast.success("Courriel de réinitialisation envoyé");
+            else toast.success(t("auth.toast.resetSent"));
           }}
           className="mt-5 text-xs text-muted-foreground underline underline-offset-4"
         >
-          Mot de passe oublié ?
+          {t("auth.forgot")}
         </button>
       )}
     </Shell>
@@ -233,9 +244,10 @@ function AuthPage() {
 }
 
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
+  const t = useT();
   return (
     <div className="mx-auto max-w-md px-5 py-20">
-      <p className="eyebrow">Registre privé</p>
+      <p className="eyebrow">{t("auth.eyebrow")}</p>
       <h1 className="mt-3 mb-8 font-display text-4xl">{title}</h1>
       {children}
     </div>
