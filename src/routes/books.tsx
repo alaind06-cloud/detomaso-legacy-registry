@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { booksQuery, marqueQuery } from "@/lib/data";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
+import { useT } from "@/lib/i18n";
 import type { Book } from "@/lib/types";
 
 const AUTHOR = "Philippe Olczyk";
+
 
 export const Route = createFileRoute("/books")({
   head: () => ({
