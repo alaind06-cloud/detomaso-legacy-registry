@@ -4,14 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
 import { detailsQuery, photosQuery, voitureBySlugQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
-import { BRAND, LANG_LABELS, LANGS, type Lang } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import { extractSpecs } from "@/lib/chassis-specs";
 import { SpecsBlock } from "@/components/site/SpecsBlock";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
 import type { Voiture } from "@/lib/types";
+
 
 export const Route = createFileRoute("/chassis/$slug")({
   validateSearch: parseRegistrySearch,
