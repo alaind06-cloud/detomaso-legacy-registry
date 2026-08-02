@@ -61,10 +61,9 @@ function Home() {
   const setQ = (v: string) => patch({ q: v.trim() ? v : undefined, p: undefined });
   const setPage = (n: number) => patch({ p: n > 1 ? n : undefined });
 
-  const modeles = useMemo(
-    () => [...new Set(voitures.map((v) => v.modele).filter(Boolean))].sort() as string[],
-    [voitures],
-  );
+  const groups = useMemo(() => availableGroups(voitures), [voitures]);
+  const selectedGroup = groups.find((g) => g.key === modele);
+
   const decennies = useMemo(() => {
     const set = new Set<number>();
     voitures.forEach((v) => {
