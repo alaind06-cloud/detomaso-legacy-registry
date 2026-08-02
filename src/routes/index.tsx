@@ -14,6 +14,7 @@ import {
   parseRegistrySearch,
   type RegistrySearch,
 } from "@/lib/filters";
+import { availableGroups } from "@/lib/model-groups";
 import { ActivePills, FilterChip, type ActivePill } from "@/components/site/FilterChip";
 import type { Voiture } from "@/lib/types";
 
@@ -84,7 +85,7 @@ function Home() {
 
   const pills: ActivePill[] = [];
   if (modele !== "all")
-    pills.push({ key: "g", label: "Modèle", value: modele, onRemove: () => setModele("all") });
+    pills.push({ key: "g", label: "Modèle", value: selectedGroup?.label ?? modele, onRemove: () => setModele("all") });
   if (decennie !== "all")
     pills.push({
       key: "d",
