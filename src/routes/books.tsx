@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { booksQuery, marqueQuery } from "@/lib/data";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
+import { useT } from "@/lib/i18n";
 import type { Book } from "@/lib/types";
 
 const AUTHOR = "Philippe Olczyk";
+
 
 export const Route = createFileRoute("/books")({
   head: () => ({
@@ -27,6 +29,7 @@ export const Route = createFileRoute("/books")({
 });
 
 function Cover({ book, large = false }: { book: Book; large?: boolean }) {
+  const t = useT();
   return (
     <div
       className={`flex items-center justify-center overflow-hidden border border-border bg-secondary ${
@@ -36,7 +39,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
       {book.couverture_url ? (
         <img
           src={book.couverture_url}
-          alt={`Couverture : ${book.titre}`}
+          alt={`${t("books.cover")} ${book.titre}`}
           loading="lazy"
           className="h-full w-full object-cover"
         />
@@ -48,6 +51,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
     </div>
   );
 }
+
 
 function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
   const content = (
@@ -69,6 +73,7 @@ function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
 function Books() {
   const { data: marque } = useQuery(marqueQuery);
   const { data: books = [], isLoading } = useQuery(booksQuery);
+  const t = useT();
 
   const featured = books.filter((b) => b.marque === BRAND_SLUG);
   const others = books.filter((b) => b.marque !== BRAND_SLUG);
@@ -76,18 +81,19 @@ function Books() {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-16">
-      <p className="eyebrow">Bibliothèque</p>
-      <h1 className="mt-3 font-display text-4xl sm:text-5xl">{marque?.books_title ?? "Books"}</h1>
+      <p className="eyebrow">{t("books.eyebrow")}</p>
+      <h1 className="mt-3 font-display text-4xl sm:text-5xl">
+        {marque?.books_title ?? t("books.title")}
+      </h1>
       <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-        Les ouvrages de {AUTHOR} qui nourrissent le travail du registre. Chaque historique de châssis est
-        recoupé avec ces documents, les archives d'usine et les témoignages de propriétaires.
+        {t("books.intro", { author: AUTHOR })}
       </p>
 
-      {isLoading && <p className="mt-14 text-sm text-muted-foreground">Chargement…</p>}
+      {isLoading && <p className="mt-14 text-sm text-muted-foreground">{t("common.loading")}</p>}
 
       {featured.length > 0 && (
         <section className="mt-14">
-          <h2 className="eyebrow">Ouvrage {brandName}</h2>
+          <h2 className="eyebrow">{t("books.featured", { brand: brandName })}</h2>
           <div className="mt-6 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((b) => (
               <BookCard key={b.id} book={b} large />
@@ -98,7 +104,7 @@ function Books() {
 
       {others.length > 0 && (
         <section className="mt-20">
-          <h2 className="eyebrow">Autres ouvrages</h2>
+          <h2 className="eyebrow">{t("books.others")}</h2>
           <div className="mt-6 grid gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {others.map((b) => (
               <BookCard key={b.id} book={b} />
@@ -108,12 +114,13 @@ function Books() {
       )}
 
       <p className="mt-16 text-sm text-muted-foreground">
-        Une référence manque à cette liste ?{" "}
+        {t("books.missing")}{" "}
         <a href={`mailto:${BRAND.contactEmail}`} className="text-primary underline underline-offset-4">
-          Signalez-la nous
+          {t("books.report")}
         </a>
         .
       </p>
+
     </div>
   );
 }

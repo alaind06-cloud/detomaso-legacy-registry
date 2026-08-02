@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export function FilterChip({
   active,
@@ -30,16 +31,17 @@ export function FilterChip({
 export type ActivePill = { key: string; label: string; value: string; onRemove: () => void };
 
 export function ActivePills({ pills }: { pills: ActivePill[] }) {
+  const t = useT();
   if (pills.length === 0) return null;
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="eyebrow mr-1">Filtres actifs</span>
+      <span className="eyebrow mr-1">{t("filters.active")}</span>
       {pills.map((p) => (
         <button
           key={p.key}
           type="button"
           onClick={p.onRemove}
-          aria-label={`Retirer le filtre ${p.label} : ${p.value}`}
+          aria-label={`${t("filters.remove")} ${p.label} : ${p.value}`}
           className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-3 py-1 text-xs transition-colors hover:border-primary hover:bg-primary/20"
         >
           <span className="tracking-[0.18em] text-primary uppercase">{p.label}</span>

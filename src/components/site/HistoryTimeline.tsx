@@ -1,4 +1,5 @@
 import { parseHistory, type TimelineEntry } from "@/lib/chassis-specs";
+import { useT } from "@/lib/i18n";
 
 export function HistoryTimeline({
   description,
@@ -13,6 +14,7 @@ export function HistoryTimeline({
   annee?: string | null;
   chassis?: string | null;
 }) {
+  const t = useT();
   const all: TimelineEntry[] = description?.trim() ? parseHistory(description) : [];
 
   if (all.length === 0) {
@@ -21,11 +23,9 @@ export function HistoryTimeline({
         <p>
           {modele ?? "De Tomaso"}
           {annee ? ` · ${annee}` : ""}
-          {chassis ? ` · châssis ${chassis}` : ""}.
+          {chassis ? ` · ${t("chassis.plate").toLowerCase()} ${chassis}` : ""}.
         </p>
-        <p className="mt-3 text-sm text-muted-foreground italic">
-          Historique en cours de documentation. Les archives du registre sont enrichies en continu.
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground italic">{t("chassis.pending")}</p>
       </div>
     );
   }

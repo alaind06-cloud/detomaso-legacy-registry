@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND } from "@/lib/brand";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -19,13 +20,14 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPassword() {
   const navigate = useNavigate();
+  const t = useT();
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 8) {
-      toast.error("8 caractères minimum");
+      toast.error(t("reset.tooShort"));
       return;
     }
     setBusy(true);
@@ -35,17 +37,17 @@ function ResetPassword() {
       toast.error(error.message);
       return;
     }
-    toast.success("Mot de passe mis à jour");
+    toast.success(t("reset.updated"));
     navigate({ to: "/" });
   }
 
   return (
     <div className="mx-auto max-w-md px-5 py-20">
-      <p className="eyebrow">Sécurité</p>
-      <h1 className="mt-3 mb-8 font-display text-4xl">Nouveau mot de passe</h1>
+      <p className="eyebrow">{t("reset.eyebrow")}</p>
+      <h1 className="mt-3 mb-8 font-display text-4xl">{t("reset.title")}</h1>
       <form onSubmit={submit} className="space-y-4">
         <label className="block">
-          <span className="eyebrow">Mot de passe</span>
+          <span className="eyebrow">{t("auth.password")}</span>
           <input
             type="password"
             value={password}
@@ -58,7 +60,7 @@ function ResetPassword() {
           disabled={busy}
           className="w-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground disabled:opacity-60"
         >
-          Enregistrer
+          {t("reset.save")}
         </button>
       </form>
     </div>

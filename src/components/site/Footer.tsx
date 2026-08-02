@@ -1,20 +1,23 @@
 import { Link } from "@tanstack/react-router";
 import { BRAND } from "@/lib/brand";
+import { useT } from "@/lib/i18n";
 
 export function Footer() {
+  const t = useT();
+
   return (
     <footer className="mt-24 border-t border-border bg-secondary/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-display text-xl tracking-[0.2em] uppercase">{BRAND.name}</p>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">{BRAND.baseline}</p>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">{t("footer.baseline")}</p>
         </div>
         <div>
-          <p className="eyebrow">Registre</p>
+          <p className="eyebrow">{t("footer.registry")}</p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
             <li>
               <Link to="/" className="hover:text-foreground">
-                Catalogue des châssis
+                {t("footer.catalog")}
               </Link>
             </li>
             <li>
@@ -25,26 +28,26 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="eyebrow">Archives</p>
+          <p className="eyebrow">{t("footer.archives")}</p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
             <li>
               <Link to="/videos" className="hover:text-foreground">
-                Vidéos
+                {t("nav.videos")}
               </Link>
             </li>
             <li>
               <Link to="/books" className="hover:text-foreground">
-                Books
+                {t("nav.books")}
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <p className="eyebrow">Accès</p>
+          <p className="eyebrow">{t("footer.access")}</p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
             <li>
               <Link to="/auth" className="hover:text-foreground">
-                Espace membre
+                {t("nav.member")}
               </Link>
             </li>
             <li>
@@ -60,7 +63,7 @@ export function Footer() {
           <span>
             © {new Date().getFullYear()} {BRAND.registerName}
           </span>
-          <span>Registre indépendant — non affilié au constructeur.</span>
+          <span>{t("footer.independent")}</span>
         </div>
       </div>
     </footer>

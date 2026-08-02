@@ -4,14 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
 import { detailsQuery, photosQuery, voitureBySlugQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
-import { BRAND, LANG_LABELS, LANGS, type Lang } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import { extractSpecs } from "@/lib/chassis-specs";
 import { SpecsBlock } from "@/components/site/SpecsBlock";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
 import type { Voiture } from "@/lib/types";
+
 
 export const Route = createFileRoute("/chassis/$slug")({
   validateSearch: parseRegistrySearch,
@@ -41,15 +43,16 @@ export const Route = createFileRoute("/chassis/$slug")({
 function ChassisPage() {
   const { slug } = Route.useParams();
   const filters = Route.useSearch();
+  const t = useT();
   const { isMember, isAdmin, loading } = useAuth();
   const { data: voiture, isLoading } = useQuery(voitureBySlugQuery(slug));
   const { data: photos = [] } = useQuery(photosQuery(voiture?.id));
   const { data: details } = useQuery(detailsQuery(voiture?.id));
   const { data: siblings = [] } = useQuery(voituresQuery);
-  const [lang, setLang] = useState<Lang>("fr");
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [mode, setMode] = useState<"summary" | "full">("full");
+
 
   const canSeeDetails = isMember || isAdmin;
 
@@ -92,11 +95,14 @@ function ChassisPage() {
     };
   }, [zoom]);
 
-  if (isLoading) return <div className="mx-auto max-w-7xl px-5 py-24 eyebrow">Chargement…</div>;
+  if (isLoading)
+    return <div className="mx-auto max-w-7xl px-5 py-24 eyebrow">{t("common.loading")}</div>;
   if (!voiture) throw notFound();
 
   const current = photos[index];
-  const history = (details?.[`description_${lang}`] ?? details?.description ?? "") as string;
+  // Contenu documentaire d'origine (anglais) : jamais localisé.
+  const history = (details?.description_en ?? details?.description ?? "") as string;
+
   const cover =
     photos.find((p) => p.filename === voiture.cover_photo) ??
     (voiture.cover_photo ? { filename: voiture.cover_photo } : photos[0]);
@@ -121,7 +127,7 @@ function ChassisPage() {
       <div className="border-b border-border bg-secondary/40">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
           <Link to="/" search={filters} hash="registre" className="eyebrow hover:text-foreground">
-            ← Retour au registre
+            {t("chassis.back")}
           </Link>
           <div className="flex items-center gap-4">
             {neighbours.total > 0 && (
@@ -147,7 +153,9 @@ function ChassisPage() {
                   className="max-h-[64vh] w-full object-contain"
                 />
               ) : (
-                <div className="grid aspect-4/3 w-full place-items-center eyebrow">Aucune photographie</div>
+                <div className="grid aspect-4/3 w-full place-items-center eyebrow">
+                  {t("chassis.noPhoto")}
+                </div>
               )}
             </div>
           </figure>
@@ -163,7 +171,9 @@ function ChassisPage() {
               </h1>
               {voiture.chassis && (
                 <span className="mt-5 inline-flex items-center gap-3 border border-primary/40 bg-primary/5 px-4 py-2">
-                  <span className="text-[0.6rem] tracking-[0.22em] text-muted-foreground uppercase">Châssis</span>
+                  <span className="text-[0.6rem] tracking-[0.22em] text-muted-foreground uppercase">
+                    {t("chassis.plate")}
+                  </span>
                   <span className="font-mono text-sm text-primary">{voiture.chassis}</span>
                 </span>
               )}
@@ -172,63 +182,49 @@ function ChassisPage() {
             <SpecsBlock specs={specs} />
 
             <aside className="border-l-2 border-primary/60 bg-secondary/50 p-5">
-              <h2 className="font-display text-lg">Provenance & authentification</h2>
+              <h2 className="font-display text-lg">{t("chassis.provenance.title")}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Chaque châssis du registre est documenté à partir d'archives d'usine, de la presse
-                d'époque et des témoignages de propriétaires successifs.
+                {t("chassis.provenance.text")}
               </p>
               <Link to="/fondateur" className="mt-3 inline-block eyebrow text-primary hover:underline">
-                Le registre & son fondateur →
+                {t("chassis.provenance.link")}
               </Link>
             </aside>
           </div>
         </div>
       </header>
 
-      {/* Historique */}
+      {/* Historique — contenu d'origine, non traduit */}
       <section className="mx-auto max-w-7xl px-5 py-12">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="font-display text-3xl">Historique</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex gap-2">
-              {LANGS.map((l) => (
+          <div>
+            <h2 className="font-display text-3xl">{t("chassis.history")}</h2>
+            <p className="mt-1 text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
+              {t("chassis.history.note")}
+            </p>
+          </div>
+          {canSeeDetails && history.trim() && (
+            <div className="inline-flex overflow-hidden border border-border text-[11px]">
+              {(["summary", "full"] as const).map((m) => (
                 <button
-                  key={l}
-                  onClick={() => setLang(l)}
+                  key={m}
+                  onClick={() => setMode(m)}
+                  aria-pressed={mode === m}
                   className={cn(
-                    "border px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase transition-colors",
-                    lang === l
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-primary hover:text-primary",
+                    "px-3 py-1.5 tracking-[0.16em] uppercase transition-colors",
+                    m === "full" && "border-l border-border",
+                    mode === m ? "bg-primary text-primary-foreground" : "hover:text-primary",
                   )}
                 >
-                  {LANG_LABELS[l].slice(0, 2)}
+                  {m === "summary" ? t("chassis.view.summary") : t("chassis.view.full")}
                 </button>
               ))}
             </div>
-            {canSeeDetails && history.trim() && (
-              <div className="inline-flex overflow-hidden border border-border text-[11px]">
-                {(["summary", "full"] as const).map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setMode(m)}
-                    aria-pressed={mode === m}
-                    className={cn(
-                      "px-3 py-1.5 tracking-[0.16em] uppercase transition-colors",
-                      m === "full" && "border-l border-border",
-                      mode === m ? "bg-primary text-primary-foreground" : "hover:text-primary",
-                    )}
-                  >
-                    {m === "summary" ? "Vue résumée" : "Vue complète"}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {loading ? (
-          <p className="text-sm text-muted-foreground">Chargement…</p>
+          <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
         ) : canSeeDetails ? (
           <HistoryTimeline
             description={history}
@@ -240,28 +236,30 @@ function ChassisPage() {
         ) : (
           <div className="max-w-xl border border-border bg-secondary/50 p-8">
             <Lock className="size-5 text-primary" />
-            <p className="mt-3 font-display text-xl">Réservé aux membres validés</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              L'historique détaillé de ce châssis est accessible aux membres du registre.
-            </p>
+            <p className="mt-3 font-display text-xl">{t("chassis.locked.title")}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("chassis.locked.text")}</p>
             <Link
               to="/auth"
               className="mt-5 inline-flex bg-primary px-5 py-2.5 text-xs tracking-[0.18em] text-primary-foreground uppercase"
             >
-              Demander l'accès
+              {t("chassis.locked.cta")}
             </Link>
           </div>
         )}
       </section>
+
+
 
       {/* Galerie */}
       {photos.length > 0 && (
         <section className="border-t border-border bg-secondary/30">
           <div className="mx-auto max-w-7xl px-5 py-12">
             <div className="mb-6 flex items-end justify-between gap-4">
-              <h2 className="font-display text-3xl">Galerie</h2>
+              <h2 className="font-display text-3xl">{t("chassis.gallery")}</h2>
               <span className="eyebrow">
-                {photos.length} photographie{photos.length > 1 ? "s" : ""}
+                {t(photos.length > 1 ? "chassis.photos.other" : "chassis.photos.one", {
+                  n: photos.length,
+                })}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
@@ -273,8 +271,9 @@ function ChassisPage() {
                     setZoom(true);
                   }}
                   className="group aspect-square overflow-hidden border border-border bg-muted"
-                  aria-label={`Agrandir la photo ${i + 1}`}
+                  aria-label={`${t("chassis.enlarge")} ${i + 1}`}
                 >
+
                   <img
                     src={photoUrl(voiture.storage_path, p.filename)}
                     alt={`${voiture.titre ?? voiture.modele} — photo ${i + 1}`}
@@ -300,7 +299,7 @@ function ChassisPage() {
           role="dialog"
           aria-modal="true"
         >
-          <button className="absolute top-5 right-5 text-white" aria-label="Fermer">
+          <button className="absolute top-5 right-5 text-white" aria-label={t("common.close")}>
             <X className="size-6" />
           </button>
           {photos.length > 1 && (
@@ -311,7 +310,7 @@ function ChassisPage() {
                   setIndex((i) => (i - 1 + photos.length) % photos.length);
                 }}
                 className="absolute top-1/2 left-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
-                aria-label="Photo précédente"
+                aria-label={t("chassis.prevPhoto")}
               >
                 <ChevronLeft className="size-8" />
               </button>
@@ -321,7 +320,7 @@ function ChassisPage() {
                   setIndex((i) => (i + 1) % photos.length);
                 }}
                 className="absolute top-1/2 right-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
-                aria-label="Photo suivante"
+                aria-label={t("chassis.nextPhoto")}
               >
                 <ChevronRight className="size-8" />
               </button>
@@ -354,6 +353,7 @@ function Pager({
   filters: ReturnType<typeof Route.useSearch>;
   wide?: boolean;
 }) {
+  const t = useT();
   if (!prev && !next) return null;
   const base =
     "inline-flex max-w-[45vw] items-center gap-2 border border-border px-4 py-2 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-primary hover:text-primary";
@@ -361,32 +361,37 @@ function Pager({
 
   return (
     <nav
-      aria-label="Navigation entre châssis"
+      aria-label={t("chassis.nav")}
       className={cn("flex flex-wrap items-center gap-3", wide ? "justify-between" : "justify-end")}
     >
       {prev ? (
         <Link to="/chassis/$slug" params={{ slug: prev.slug }} search={filters} className={base}>
           <ChevronLeft className="size-3.5 shrink-0" />
-          <span className="truncate">{wide ? `Précédent · ${label(prev)}` : label(prev)}</span>
+          <span className="truncate">
+            {wide ? `${t("common.prev")} · ${label(prev)}` : label(prev)}
+          </span>
         </Link>
       ) : (
         <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
           <ChevronLeft className="size-3.5" />
-          <span>Précédent</span>
+          <span>{t("common.prev")}</span>
         </span>
       )}
       {next ? (
         <Link to="/chassis/$slug" params={{ slug: next.slug }} search={filters} className={base}>
-          <span className="truncate">{wide ? `Suivant · ${label(next)}` : label(next)}</span>
+          <span className="truncate">
+            {wide ? `${t("common.next")} · ${label(next)}` : label(next)}
+          </span>
           <ChevronRight className="size-3.5 shrink-0" />
         </Link>
       ) : (
         <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
-          <span>Suivant</span>
+          <span>{t("common.next")}</span>
           <ChevronRight className="size-3.5" />
         </span>
       )}
     </nav>
+
   );
 }
 
