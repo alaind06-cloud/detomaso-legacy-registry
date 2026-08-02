@@ -3,13 +3,13 @@ import type { Voiture } from "@/lib/types";
 /** Filtres du registre, synchronisés dans l'URL (partageables + retour arrière fidèle). */
 export type RegistrySearch = {
   /** Modèle */
-  g?: string;
+  g?: string | undefined;
   /** Décennie (1960, 1970…) */
-  d?: string;
+  d?: string | undefined;
   /** Recherche libre (châssis, titre) */
-  q?: string;
+  q?: string | undefined;
   /** Page courante */
-  p?: number;
+  p?: number | undefined;
 };
 
 export const PAGE_SIZE = 24;
@@ -17,14 +17,15 @@ export const REGISTRY_SCROLL_KEY = "registry:scroll";
 
 export function parseRegistrySearch(search: Record<string, unknown>): RegistrySearch {
   const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
-  const page = Number(search.p);
+  const page = Number(search["p"]);
   return {
-    g: str(search.g),
-    d: str(search.d),
-    q: str(search.q),
+    g: str(search["g"]),
+    d: str(search["d"]),
+    q: str(search["q"]),
     p: Number.isFinite(page) && page > 1 ? Math.floor(page) : undefined,
   };
 }
+
 
 export function yearOf(annee: string | null): number | null {
   const m = (annee ?? "").match(/\d{4}/);
