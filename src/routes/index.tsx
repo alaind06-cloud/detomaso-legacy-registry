@@ -16,7 +16,9 @@ import {
 } from "@/lib/filters";
 import { availableGroups } from "@/lib/model-groups";
 import { ActivePills, FilterChip, type ActivePill } from "@/components/site/FilterChip";
+import { useT } from "@/lib/i18n";
 import type { Voiture } from "@/lib/types";
+
 
 export const Route = createFileRoute("/")({
   validateSearch: parseRegistrySearch,
