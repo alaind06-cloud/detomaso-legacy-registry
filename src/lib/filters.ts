@@ -40,11 +40,15 @@ export function decadeOf(annee: string | null): number | null {
 }
 
 export function matchesFilters(v: Voiture, f: RegistrySearch): boolean {
-  if (f.g && v.modele !== f.g) return false;
+  if (f.g) {
+    const group = MODEL_GROUPS.find((g) => g.key === f.g);
+    if (!group || !group.test(v)) return false;
+  }
   if (f.d) {
     const dec = decadeOf(v.annee);
     if (dec === null || String(dec) !== f.d) return false;
   }
+
   if (f.q) {
     const needle = f.q.toLowerCase().replace(/\s+/g, "");
     const hay = `${v.chassis ?? ""} ${v.titre ?? ""} ${v.modele ?? ""} ${v.annee ?? ""}`
