@@ -106,146 +106,182 @@ function ChassisPage() {
   };
 
   return (
-    <article className="mx-auto max-w-7xl px-5 py-12">
+    <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <Link to="/" search={filters} hash="registre" className="eyebrow hover:text-foreground">
-          ← Retour au registre
-        </Link>
-        <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} />
+      {/* Bandeau de navigation */}
+      <div className="border-b border-border bg-secondary/40">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
+          <Link to="/" search={filters} hash="registre" className="eyebrow hover:text-foreground">
+            ← Retour au registre
+          </Link>
+          <div className="flex items-center gap-4">
+            {neighbours.total > 0 && (
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {neighbours.position} / {neighbours.total}
+              </span>
+            )}
+            <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} />
+          </div>
+        </div>
       </div>
 
-      <header className="mt-6 flex flex-wrap items-end justify-between gap-6 border-b border-border pb-8">
-        <div>
-          <p className="eyebrow">
-            {voiture.modele}
-            {neighbours.total > 0 && ` · ${neighbours.position} / ${neighbours.total}`}
-          </p>
-          <h1 className="mt-3 font-display text-4xl sm:text-5xl">{voiture.titre ?? voiture.modele}</h1>
-        </div>
+      {/* Hero éditorial */}
+      <header className="border-b border-border">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[1.55fr_1fr] lg:py-14">
+          <figure className="border border-border bg-card p-2 sm:p-3">
+            <div className="flex items-center justify-center overflow-hidden bg-muted">
+              {cover ? (
+                <img
+                  src={photoUrl(voiture.storage_path, cover.filename)}
+                  alt={voiture.titre ?? voiture.modele ?? "De Tomaso"}
+                  fetchPriority="high"
+                  className="max-h-[64vh] w-full object-contain"
+                />
+              ) : (
+                <div className="grid aspect-4/3 w-full place-items-center eyebrow">Aucune photographie</div>
+              )}
+            </div>
+          </figure>
 
-        <dl className="flex gap-10">
-          <div>
-            <dt className="eyebrow">Châssis</dt>
-            <dd className="mt-1 font-mono text-lg text-primary">{voiture.chassis ?? "—"}</dd>
+          <div className="flex flex-col gap-7">
+            <div>
+              <p className="eyebrow">
+                {voiture.modele ?? "De Tomaso"}
+                {voiture.annee ? ` · ${voiture.annee}` : ""}
+              </p>
+              <h1 className="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl">
+                {voiture.titre ?? voiture.modele}
+              </h1>
+              {voiture.chassis && (
+                <span className="mt-5 inline-flex items-center gap-3 border border-primary/40 bg-primary/5 px-4 py-2">
+                  <span className="text-[0.6rem] tracking-[0.22em] text-muted-foreground uppercase">Châssis</span>
+                  <span className="font-mono text-sm text-primary">{voiture.chassis}</span>
+                </span>
+              )}
+            </div>
+
+            <SpecsBlock specs={specs} />
+
+            <aside className="border-l-2 border-primary/60 bg-secondary/50 p-5">
+              <h2 className="font-display text-lg">Provenance & authentification</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Chaque châssis du registre est documenté à partir d'archives d'usine, de la presse
+                d'époque et des témoignages de propriétaires successifs.
+              </p>
+              <Link to="/expert" className="mt-3 inline-block eyebrow text-primary hover:underline">
+                L'expertise du registre →
+              </Link>
+            </aside>
           </div>
-          <div>
-            <dt className="eyebrow">Année</dt>
-            <dd className="mt-1 font-mono text-lg">{voiture.annee ?? "—"}</dd>
-          </div>
-        </dl>
+        </div>
       </header>
 
-      <div className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <div className="relative aspect-4/3 overflow-hidden bg-muted">
-            {current ? (
-              <>
-                <img
-                  src={photoUrl(voiture.storage_path, current.filename)}
-                  alt={`${voiture.titre ?? voiture.modele} — photo ${index + 1}`}
-                  className="size-full object-cover"
-                />
+      {/* Historique */}
+      <section className="mx-auto max-w-7xl px-5 py-12">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <h2 className="font-display text-3xl">Historique</h2>
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2">
+              {LANGS.map((l) => (
                 <button
-                  onClick={() => setZoom(true)}
-                  className="absolute top-3 right-3 bg-background/85 p-2 hover:bg-background"
-                  aria-label="Agrandir"
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={cn(
+                    "border px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase transition-colors",
+                    lang === l
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border hover:border-primary hover:text-primary",
+                  )}
                 >
-                  <ZoomIn className="size-4" />
+                  {LANG_LABELS[l].slice(0, 2)}
                 </button>
-                {photos.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setIndex((i) => (i - 1 + photos.length) % photos.length)}
-                      className="absolute top-1/2 left-3 -translate-y-1/2 bg-background/85 p-2 hover:bg-background"
-                      aria-label="Photo précédente"
-                    >
-                      <ChevronLeft className="size-5" />
-                    </button>
-                    <button
-                      onClick={() => setIndex((i) => (i + 1) % photos.length)}
-                      className="absolute top-1/2 right-3 -translate-y-1/2 bg-background/85 p-2 hover:bg-background"
-                      aria-label="Photo suivante"
-                    >
-                      <ChevronRight className="size-5" />
-                    </button>
-                    <span className="absolute bottom-3 left-3 bg-background/85 px-2.5 py-1 font-mono text-xs">
-                      {index + 1} / {photos.length}
-                    </span>
-                  </>
-                )}
-              </>
-            ) : (
-              <div className="flex size-full items-center justify-center eyebrow">Aucune photographie</div>
+              ))}
+            </div>
+            {canSeeDetails && history.trim() && (
+              <div className="inline-flex overflow-hidden border border-border text-[11px]">
+                {(["summary", "full"] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMode(m)}
+                    aria-pressed={mode === m}
+                    className={cn(
+                      "px-3 py-1.5 tracking-[0.16em] uppercase transition-colors",
+                      m === "full" && "border-l border-border",
+                      mode === m ? "bg-primary text-primary-foreground" : "hover:text-primary",
+                    )}
+                  >
+                    {m === "summary" ? "Vue résumée" : "Vue complète"}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
+        </div>
 
-          {photos.length > 1 && (
-            <div className="mt-3 grid grid-cols-6 gap-2">
+        {loading ? (
+          <p className="text-sm text-muted-foreground">Chargement…</p>
+        ) : canSeeDetails ? (
+          <HistoryTimeline
+            description={history}
+            mode={mode}
+            modele={voiture.modele}
+            annee={voiture.annee}
+            chassis={voiture.chassis}
+          />
+        ) : (
+          <div className="max-w-xl border border-border bg-secondary/50 p-8">
+            <Lock className="size-5 text-primary" />
+            <p className="mt-3 font-display text-xl">Réservé aux membres validés</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              L'historique détaillé de ce châssis est accessible aux membres du registre.
+            </p>
+            <Link
+              to="/auth"
+              className="mt-5 inline-flex bg-primary px-5 py-2.5 text-xs tracking-[0.18em] text-primary-foreground uppercase"
+            >
+              Demander l'accès
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* Galerie */}
+      {photos.length > 0 && (
+        <section className="border-t border-border bg-secondary/30">
+          <div className="mx-auto max-w-7xl px-5 py-12">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <h2 className="font-display text-3xl">Galerie</h2>
+              <span className="eyebrow">
+                {photos.length} photographie{photos.length > 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
               {photos.map((p, i) => (
                 <button
                   key={p.id}
-                  onClick={() => setIndex(i)}
-                  className={cn(
-                    "aspect-square overflow-hidden bg-muted opacity-60 transition-opacity hover:opacity-100",
-                    i === index && "opacity-100 ring-2 ring-primary",
-                  )}
+                  onClick={() => {
+                    setIndex(i);
+                    setZoom(true);
+                  }}
+                  className="group aspect-square overflow-hidden border border-border bg-muted"
+                  aria-label={`Agrandir la photo ${i + 1}`}
                 >
                   <img
                     src={photoUrl(voiture.storage_path, p.filename)}
-                    alt=""
+                    alt={`${voiture.titre ?? voiture.modele} — photo ${i + 1}`}
                     loading="lazy"
-                    className="size-full object-cover"
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </button>
               ))}
             </div>
-          )}
-        </div>
-
-        <aside>
-          <h2 className="font-display text-2xl">Historique</h2>
-          <div className="mt-4 flex gap-2">
-            {LANGS.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={cn(
-                  "border px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase",
-                  lang === l ? "border-primary bg-primary text-primary-foreground" : "border-border",
-                )}
-              >
-                {LANG_LABELS[l].slice(0, 2)}
-              </button>
-            ))}
           </div>
+        </section>
+      )}
 
-          {loading ? (
-            <p className="mt-6 text-sm text-muted-foreground">Chargement…</p>
-          ) : canSeeDetails ? (
-            <div className="mt-6 space-y-4 text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
-              {history || "Historique en cours de documentation."}
-            </div>
-          ) : (
-            <div className="mt-6 border border-border bg-secondary/50 p-6">
-              <Lock className="size-5 text-primary" />
-              <p className="mt-3 font-display text-lg">Réservé aux membres validés</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                L'historique détaillé de ce châssis est accessible aux membres du registre.
-              </p>
-              <Link
-                to="/auth"
-                className="mt-5 inline-flex bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground"
-              >
-                Demander l'accès
-              </Link>
-            </div>
-          )}
-        </aside>
-      </div>
-
-      <div className="mt-14 border-t border-border pt-6">
+      <div className="mx-auto max-w-7xl px-5 py-10">
         <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} wide />
       </div>
 
@@ -297,6 +333,7 @@ function ChassisPage() {
     </article>
   );
 }
+
 
 function Pager({
   prev,
