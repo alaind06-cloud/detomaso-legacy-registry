@@ -43,15 +43,16 @@ export const Route = createFileRoute("/chassis/$slug")({
 function ChassisPage() {
   const { slug } = Route.useParams();
   const filters = Route.useSearch();
+  const t = useT();
   const { isMember, isAdmin, loading } = useAuth();
   const { data: voiture, isLoading } = useQuery(voitureBySlugQuery(slug));
   const { data: photos = [] } = useQuery(photosQuery(voiture?.id));
   const { data: details } = useQuery(detailsQuery(voiture?.id));
   const { data: siblings = [] } = useQuery(voituresQuery);
-  const [lang, setLang] = useState<Lang>("fr");
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [mode, setMode] = useState<"summary" | "full">("full");
+
 
   const canSeeDetails = isMember || isAdmin;
 
