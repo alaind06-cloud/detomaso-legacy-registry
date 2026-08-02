@@ -11,6 +11,9 @@ async function unwrap<T>(p: PromiseLike<{ data: T | null; error: { message: stri
   return (data ?? []) as T;
 }
 
+// Fiche technique interne, jamais affichée dans le registre.
+const HIDDEN_SLUGS = new Set(["00-cover"]);
+
 export const voituresQuery = queryOptions({
   queryKey: ["voitures", BRAND_SLUG],
   queryFn: async () => {
@@ -23,12 +26,14 @@ export const voituresQuery = queryOptions({
         .order("id", { ascending: true }),
     );
     // Ordre de référence du site historique en priorité, puis ordre_affichage / id.
-    return [...rows].sort(
-      (a, b) =>
-        referenceRank(a.slug) - referenceRank(b.slug) ||
-        (a.ordre_affichage ?? Number.MAX_SAFE_INTEGER) - (b.ordre_affichage ?? Number.MAX_SAFE_INTEGER) ||
-        a.id - b.id,
-    );
+    return rows
+      .filter((r) => !HIDDEN_SLUGS.has((r.slug ?? "").toLowerCase()))
+      .sort(
+        (a, b) =>
+          referenceRank(a.slug) - referenceRank(b.slug) ||
+          (a.ordre_affichage ?? Number.MAX_SAFE_INTEGER) - (b.ordre_affichage ?? Number.MAX_SAFE_INTEGER) ||
+          a.id - b.id,
+      );
   },
 });
 
