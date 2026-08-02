@@ -245,17 +245,51 @@ function ChassisPage() {
         </aside>
       </div>
 
+      <div className="mt-14 border-t border-border pt-6">
+        <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} wide />
+      </div>
+
       {zoom && current && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-6"
           onClick={() => setZoom(false)}
+          role="dialog"
+          aria-modal="true"
         >
           <button className="absolute top-5 right-5 text-white" aria-label="Fermer">
             <X className="size-6" />
           </button>
+          {photos.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i - 1 + photos.length) % photos.length);
+                }}
+                className="absolute top-1/2 left-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                aria-label="Photo précédente"
+              >
+                <ChevronLeft className="size-8" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i + 1) % photos.length);
+                }}
+                className="absolute top-1/2 right-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                aria-label="Photo suivante"
+              >
+                <ChevronRight className="size-8" />
+              </button>
+              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs text-white/70">
+                {index + 1} / {photos.length}
+              </span>
+            </>
+          )}
           <img
             src={photoUrl(voiture.storage_path, current.filename)}
             alt=""
+            onClick={(e) => e.stopPropagation()}
             className="max-h-full max-w-full object-contain"
           />
         </div>
@@ -263,3 +297,51 @@ function ChassisPage() {
     </article>
   );
 }
+
+function Pager({
+  prev,
+  next,
+  filters,
+  wide = false,
+}: {
+  prev: Voiture | null;
+  next: Voiture | null;
+  filters: ReturnType<typeof Route.useSearch>;
+  wide?: boolean;
+}) {
+  if (!prev && !next) return null;
+  const base =
+    "inline-flex max-w-[45vw] items-center gap-2 border border-border px-4 py-2 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-primary hover:text-primary";
+  const label = (v: Voiture) => v.chassis ?? v.titre ?? v.modele ?? "—";
+
+  return (
+    <nav
+      aria-label="Navigation entre châssis"
+      className={cn("flex flex-wrap items-center gap-3", wide ? "justify-between" : "justify-end")}
+    >
+      {prev ? (
+        <Link to="/chassis/$slug" params={{ slug: prev.slug }} search={filters} className={base}>
+          <ChevronLeft className="size-3.5 shrink-0" />
+          <span className="truncate">{wide ? `Précédent · ${label(prev)}` : label(prev)}</span>
+        </Link>
+      ) : (
+        <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
+          <ChevronLeft className="size-3.5" />
+          <span>Précédent</span>
+        </span>
+      )}
+      {next ? (
+        <Link to="/chassis/$slug" params={{ slug: next.slug }} search={filters} className={base}>
+          <span className="truncate">{wide ? `Suivant · ${label(next)}` : label(next)}</span>
+          <ChevronRight className="size-3.5 shrink-0" />
+        </Link>
+      ) : (
+        <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
+          <span>Suivant</span>
+          <ChevronRight className="size-3.5" />
+        </span>
+      )}
+    </nav>
+  );
+}
+
