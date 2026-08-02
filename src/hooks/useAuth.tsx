@@ -26,13 +26,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfil(null);
       return;
     }
-    const { data } = await supabase
-      .from("profils")
-      .select("*")
-      .eq("id", userId)
-      .eq("marque", BRAND_SLUG)
-      .maybeSingle();
-    setProfil((data as Profil | null) ?? null);
+    // Les comptes sont partagés entre les registres du projet Supabase :
+    // on ne filtre pas sur la marque (sinon un admin créé sur un autre
+    // registre serait vu comme non connecté / non membre ici).
+    const { data, error } = await supabase.from("profils").select("*").eq("id", userId);
+    if (error) console.error("profil:", error.message);
+    const rows = (data as Profil[] | null) ?? [];
+    setProfil(rows.find((r) => r.marque === BRAND_SLUG) ?? rows[0] ?? null);
   }
 
   useEffect(() => {
