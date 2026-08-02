@@ -292,6 +292,7 @@ function CarCard({
   filters: RegistrySearch;
   priority: boolean;
 }) {
+  const t = useT();
   return (
     <Link
       to="/chassis/$slug"
@@ -307,13 +308,16 @@ function CarCard({
         {v.cover_photo ? (
           <img
             src={photoUrl(v.storage_path, v.cover_photo)}
-            alt={v.titre ?? `Châssis ${v.chassis}`}
+            alt={v.titre ?? `${t("chassis.plate")} ${v.chassis}`}
             loading={priority ? "eager" : "lazy"}
             className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex size-full items-center justify-center eyebrow">Sans visuel</div>
+          <div className="flex size-full items-center justify-center eyebrow">
+            {t("home.noVisual")}
+          </div>
         )}
+
         {v.annee && (
           <span className="absolute top-0 left-0 bg-background/90 px-3 py-1.5 text-[11px] tracking-[0.18em]">
             {v.annee}
