@@ -58,6 +58,15 @@ export interface Marque {
   ordre: number | null;
 }
 
+export interface Book {
+  id: number;
+  marque: string | null;
+  titre: string;
+  couverture_url: string | null;
+  lien_achat: string | null;
+  ordre: number | null;
+}
+
 export interface Video {
   id: number;
   marque: string;
