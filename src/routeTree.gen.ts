@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as FondateurRouteImport } from './routes/fondateur'
 import { Route as VideosRouteImport } from './routes/videos'
@@ -18,6 +19,11 @@ import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BooksRoute = BooksRouteImport.update({
@@ -43,6 +49,7 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/videos': typeof VideosRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/videos': typeof VideosRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/videos': typeof VideosRoute
@@ -65,14 +74,23 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
+  fullPaths:
+    '/' | '/auth' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
-  id: '__root__' | '/' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
+  to: '/' | '/auth' | '/books' | '/fondateur' | '/videos' | '/chassis/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/books'
+    | '/fondateur'
+    | '/videos'
+    | '/chassis/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   BooksRoute: typeof BooksRoute
   FondateurRoute: typeof FondateurRoute
   VideosRoute: typeof VideosRoute
@@ -86,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/books': {
@@ -121,6 +146,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   BooksRoute: BooksRoute,
   FondateurRoute: FondateurRoute,
   VideosRoute: VideosRoute,
