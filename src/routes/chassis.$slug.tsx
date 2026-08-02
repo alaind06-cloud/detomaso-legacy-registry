@@ -49,6 +49,7 @@ function ChassisPage() {
   const [lang, setLang] = useState<Lang>("fr");
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
+  const [mode, setMode] = useState<"summary" | "full">("full");
 
   const canSeeDetails = isMember || isAdmin;
 
