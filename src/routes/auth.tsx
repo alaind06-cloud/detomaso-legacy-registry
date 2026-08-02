@@ -23,6 +23,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+const RAISONS = [
+  "Propriétaire d'une De Tomaso",
+  "Ancien propriétaire",
+  "Passionné / collectionneur",
+  "Historien / chercheur",
+  "Professionnel de l'automobile",
+  "Autre",
+] as const;
+
 function AuthPage() {
   const navigate = useNavigate();
   const { user, profil, isMember, refresh } = useAuth();
