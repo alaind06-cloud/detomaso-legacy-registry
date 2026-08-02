@@ -46,6 +46,8 @@ function Home() {
   const { data: voitures = [], isLoading, error } = useQuery(voituresQuery);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/" });
+  const t = useT();
+
 
   const modele = search.g ?? "all";
   const decennie = search.d ?? "all";
@@ -87,15 +89,17 @@ function Home() {
 
   const pills: ActivePill[] = [];
   if (modele !== "all")
-    pills.push({ key: "g", label: "Modèle", value: selectedGroup?.label ?? modele, onRemove: () => setModele("all") });
+    pills.push({ key: "g", label: t("home.model"), value: selectedGroup?.label ?? modele, onRemove: () => setModele("all") });
   if (decennie !== "all")
     pills.push({
       key: "d",
-      label: "Décennie",
+      label: t("home.decade"),
       value: `${decennie}s`,
       onRemove: () => setDecennie("all"),
     });
-  if (q.trim()) pills.push({ key: "q", label: "Recherche", value: q.trim(), onRemove: () => setQ("") });
+  if (q.trim())
+    pills.push({ key: "q", label: t("filters.search"), value: q.trim(), onRemove: () => setQ("") });
+
 
   // Restaure la position de défilement au retour depuis une fiche châssis.
   useEffect(() => {
