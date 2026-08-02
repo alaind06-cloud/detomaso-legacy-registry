@@ -1,14 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import heroImage from "@/assets/hero-detomaso.jpg";
 import { voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
 import { BRAND } from "@/lib/brand";
-import { cn } from "@/lib/utils";
+import {
+  PAGE_SIZE,
+  REGISTRY_SCROLL_KEY,
+  decadeOf,
+  matchesFilters,
+  parseRegistrySearch,
+  type RegistrySearch,
+} from "@/lib/filters";
+import { availableGroups } from "@/lib/model-groups";
+import { ActivePills, FilterChip, type ActivePill } from "@/components/site/FilterChip";
+import type { Voiture } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
+  validateSearch: parseRegistrySearch,
   head: () => ({
     meta: [
       { title: `${BRAND.registerName} — Registre mondial des châssis De Tomaso` },
@@ -31,29 +42,76 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data: voitures = [], isLoading, error } = useQuery(voituresQuery);
-  const [modele, setModele] = useState<string>("all");
-  const [annee, setAnnee] = useState<string>("all");
-  const [q, setQ] = useState("");
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/" });
 
-  const modeles = useMemo(
-    () => [...new Set(voitures.map((v) => v.modele).filter(Boolean))].sort() as string[],
-    [voitures],
-  );
-  const annees = useMemo(
-    () => [...new Set(voitures.map((v) => v.annee).filter(Boolean))].sort() as string[],
-    [voitures],
+  const modele = search.g ?? "all";
+  const decennie = search.d ?? "all";
+  const q = search.q ?? "";
+  const page = Math.max(1, search.p ?? 1);
+
+  const patch = (next: Partial<RegistrySearch>) =>
+    navigate({
+      search: (prev: RegistrySearch) => ({ ...prev, ...next }),
+      replace: true,
+      resetScroll: false,
+    });
+
+  const setModele = (v: string) => patch({ g: v === "all" ? undefined : v, p: undefined });
+  const setDecennie = (v: string) => patch({ d: v === "all" ? undefined : v, p: undefined });
+  const setQ = (v: string) => patch({ q: v.trim() ? v : undefined, p: undefined });
+  const setPage = (n: number) => patch({ p: n > 1 ? n : undefined });
+
+  const groups = useMemo(() => availableGroups(voitures), [voitures]);
+  const selectedGroup = groups.find((g) => g.key === modele);
+
+  const decennies = useMemo(() => {
+    const set = new Set<number>();
+    voitures.forEach((v) => {
+      const d = decadeOf(v.annee);
+      if (d) set.add(d);
+    });
+    return [...set].sort();
+  }, [voitures]);
+
+  const filtered = useMemo(
+    () => voitures.filter((v) => matchesFilters(v, search)),
+    [voitures, search],
   );
 
-  const filtered = voitures.filter((v) => {
-    if (modele !== "all" && v.modele !== modele) return false;
-    if (annee !== "all" && v.annee !== annee) return false;
-    if (q.trim()) {
-      const needle = q.trim().toLowerCase();
-      const hay = `${v.chassis ?? ""} ${v.titre ?? ""} ${v.modele ?? ""}`.toLowerCase();
-      if (!hay.includes(needle)) return false;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const items = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const pills: ActivePill[] = [];
+  if (modele !== "all")
+    pills.push({ key: "g", label: "Modèle", value: selectedGroup?.label ?? modele, onRemove: () => setModele("all") });
+  if (decennie !== "all")
+    pills.push({
+      key: "d",
+      label: "Décennie",
+      value: `${decennie}s`,
+      onRemove: () => setDecennie("all"),
+    });
+  if (q.trim()) pills.push({ key: "q", label: "Recherche", value: q.trim(), onRemove: () => setQ("") });
+
+  // Restaure la position de défilement au retour depuis une fiche châssis.
+  useEffect(() => {
+    if (isLoading || typeof window === "undefined") return;
+    const saved = sessionStorage.getItem(REGISTRY_SCROLL_KEY);
+    if (!saved) return;
+    sessionStorage.removeItem(REGISTRY_SCROLL_KEY);
+    const y = parseInt(saved, 10);
+    if (!Number.isFinite(y)) return;
+    requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "auto" }));
+  }, [isLoading]);
+
+  const goToPage = (n: number) => {
+    setPage(n);
+    if (typeof window !== "undefined") {
+      document.getElementById("registre")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    return true;
-  });
+  };
 
   return (
     <>
@@ -93,48 +151,69 @@ function Home() {
         </div>
       </section>
 
-      <section id="registre" className="mx-auto max-w-7xl px-5 py-16">
-        <div className="flex flex-wrap items-end justify-between gap-6 border-b border-border pb-6">
-          <div>
-            <p className="eyebrow">Le registre</p>
-            <h2 className="mt-2 font-display text-3xl">
-              {filtered.length} châssis référencé{filtered.length > 1 ? "s" : ""}
-            </h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
+      <section id="registre" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-16">
+        <div className="border-b border-border pb-8">
+          <p className="eyebrow">Le registre</p>
+          <h2 className="mt-2 font-display text-3xl">Rechercher un châssis</h2>
+
+          <div className="mt-8 max-w-md">
+            <label htmlFor="registry-search" className="eyebrow mb-2 block">
+              Recherche
+            </label>
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
+                id="registry-search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="N° de châssis…"
-                className="h-11 w-56 border border-input bg-card pr-3 pl-9 text-sm outline-none focus:border-primary"
+                placeholder="N° de châssis, modèle, année…"
+                className="h-11 w-full border border-input bg-card pr-3 pl-9 text-sm outline-none focus:border-primary"
               />
             </div>
-            <select
-              value={modele}
-              onChange={(e) => setModele(e.target.value)}
-              className="h-11 border border-input bg-card px-3 text-sm outline-none focus:border-primary"
-            >
-              <option value="all">Tous les modèles</option>
-              {modeles.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
+          </div>
+
+          <div className="mt-8">
+            <span className="eyebrow mb-3 block">Modèle</span>
+            <div className="flex flex-wrap gap-2">
+              <FilterChip active={modele === "all"} onClick={() => setModele("all")}>
+                Tous
+              </FilterChip>
+              {groups.map((g) => (
+                <FilterChip key={g.key} active={modele === g.key} onClick={() => setModele(g.key)}>
+                  {g.label}
+                </FilterChip>
               ))}
-            </select>
-            <select
-              value={annee}
-              onChange={(e) => setAnnee(e.target.value)}
-              className="h-11 border border-input bg-card px-3 text-sm outline-none focus:border-primary"
-            >
-              <option value="all">Toutes les années</option>
-              {annees.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
+
+            </div>
+          </div>
+
+          {decennies.length > 1 && (
+            <div className="mt-6">
+              <span className="eyebrow mb-3 block">Décennie</span>
+              <div className="flex flex-wrap gap-2">
+                <FilterChip active={decennie === "all"} onClick={() => setDecennie("all")}>
+                  Toutes
+                </FilterChip>
+                {decennies.map((d) => (
+                  <FilterChip
+                    key={d}
+                    active={decennie === String(d)}
+                    onClick={() => setDecennie(String(d))}
+                  >
+                    {d}s
+                  </FilterChip>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <ActivePills pills={pills} />
+            <p className="eyebrow ml-auto" aria-live="polite" aria-atomic="true">
+              {isLoading
+                ? "…"
+                : `${filtered.length} châssis référencé${filtered.length > 1 ? "s" : ""}`}
+            </p>
           </div>
         </div>
 
@@ -144,56 +223,116 @@ function Home() {
           </p>
         )}
 
-        {isLoading ? (
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-4/3 animate-pulse bg-muted" />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-10 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((v) => (
-              <Link
-                key={v.id}
-                to="/chassis/$slug"
-                params={{ slug: v.slug }}
-                className="group block"
-              >
-                <div className="relative aspect-4/3 overflow-hidden bg-muted">
-                  {v.cover_photo ? (
-                    <img
-                      src={photoUrl(v.storage_path, v.cover_photo)}
-                      alt={v.titre ?? `Châssis ${v.chassis}`}
-                      loading="lazy"
-                      className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center eyebrow">Sans visuel</div>
-                  )}
-                  {v.annee && (
-                    <span className="absolute top-0 left-0 bg-background/90 px-3 py-1.5 text-[11px] tracking-[0.18em]">
-                      {v.annee}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border pt-3">
-                  <div>
-                    <h3 className="font-display text-xl leading-tight">{v.titre ?? v.modele}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{v.modele}</p>
-                  </div>
-                  <span className={cn("shrink-0 font-mono text-xs text-primary")}>{v.chassis}</span>
-                </div>
-              </Link>
-            ))}
+        {!isLoading && totalPages > 1 && (
+          <p className="mt-6 text-right eyebrow">
+            Page {currentPage} / {totalPages}
+          </p>
+        )}
+
+        <div className="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3" aria-busy={isLoading}>
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)
+            : items.map((v, i) => (
+                <CarCard key={v.id} v={v} filters={search} priority={i < 3} />
+              ))}
+        </div>
+
+        {!isLoading && filtered.length === 0 && !error && (
+          <div className="mt-16 text-center">
+            <p className="text-sm text-muted-foreground">
+              Aucun châssis ne correspond à cette recherche.
+            </p>
+            <button
+              onClick={() => navigate({ search: {}, replace: true, resetScroll: false })}
+              className="mt-4 border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] hover:bg-accent"
+            >
+              Réinitialiser les filtres
+            </button>
           </div>
         )}
 
-        {!isLoading && filtered.length === 0 && !error && (
-          <p className="mt-16 text-center text-sm text-muted-foreground">
-            Aucun châssis ne correspond à cette recherche.
-          </p>
+        {!isLoading && totalPages > 1 && (
+          <nav className="mt-12 flex items-center justify-center gap-3" aria-label="Pagination">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent disabled:opacity-40"
+            >
+              Précédent
+            </button>
+            <span className="px-2 font-mono text-sm text-muted-foreground">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent disabled:opacity-40"
+            >
+              Suivant
+            </button>
+          </nav>
         )}
       </section>
     </>
+  );
+}
+
+function CarCard({
+  v,
+  filters,
+  priority,
+}: {
+  v: Voiture;
+  filters: RegistrySearch;
+  priority: boolean;
+}) {
+  return (
+    <Link
+      to="/chassis/$slug"
+      params={{ slug: v.slug }}
+      search={filters}
+      onClick={() => {
+        if (typeof window !== "undefined")
+          sessionStorage.setItem(REGISTRY_SCROLL_KEY, String(window.scrollY));
+      }}
+      className="group block"
+    >
+      <div className="relative aspect-4/3 overflow-hidden bg-muted">
+        {v.cover_photo ? (
+          <img
+            src={photoUrl(v.storage_path, v.cover_photo)}
+            alt={v.titre ?? `Châssis ${v.chassis}`}
+            loading={priority ? "eager" : "lazy"}
+            className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex size-full items-center justify-center eyebrow">Sans visuel</div>
+        )}
+        {v.annee && (
+          <span className="absolute top-0 left-0 bg-background/90 px-3 py-1.5 text-[11px] tracking-[0.18em]">
+            {v.annee}
+          </span>
+        )}
+      </div>
+      <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border pt-3">
+        <div>
+          <h3 className="font-display text-xl leading-tight">{v.titre ?? v.modele}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{v.modele}</p>
+        </div>
+        <span className="shrink-0 font-mono text-xs text-primary">{v.chassis}</span>
+      </div>
+    </Link>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div aria-hidden>
+      <div className="aspect-4/3 animate-pulse bg-muted" />
+      <div className="mt-4 space-y-3 border-t border-border pt-3">
+        <div className="h-4 w-3/4 animate-pulse bg-muted" />
+        <div className="h-3 w-1/3 animate-pulse bg-muted" />
+      </div>
+    </div>
   );
 }

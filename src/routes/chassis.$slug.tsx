@@ -1,14 +1,17 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Lock, X, ZoomIn } from "lucide-react";
-import { detailsQuery, photosQuery, voitureBySlugQuery } from "@/lib/data";
+import { detailsQuery, photosQuery, voitureBySlugQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
 import { BRAND, LANG_LABELS, LANGS, type Lang } from "@/lib/brand";
+import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import type { Voiture } from "@/lib/types";
 
 export const Route = createFileRoute("/chassis/$slug")({
+  validateSearch: parseRegistrySearch,
   head: ({ params }) => {
     const url = `${BRAND.siteUrl}/chassis/${params.slug}`;
     return {
@@ -31,17 +34,38 @@ export const Route = createFileRoute("/chassis/$slug")({
   component: ChassisPage,
 });
 
+
 function ChassisPage() {
   const { slug } = Route.useParams();
+  const filters = Route.useSearch();
   const { isMember, isAdmin, loading } = useAuth();
   const { data: voiture, isLoading } = useQuery(voitureBySlugQuery(slug));
   const { data: photos = [] } = useQuery(photosQuery(voiture?.id));
   const { data: details } = useQuery(detailsQuery(voiture?.id));
+  const { data: siblings = [] } = useQuery(voituresQuery);
   const [lang, setLang] = useState<Lang>("fr");
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
 
   const canSeeDetails = isMember || isAdmin;
+
+  // Voisins dans la liste courante (filtres du registre conservés).
+  const neighbours = useMemo(() => {
+    const scoped = hasFilters(filters) ? siblings.filter((v) => matchesFilters(v, filters)) : siblings;
+    const list = scoped.some((v) => v.slug === slug) ? scoped : siblings;
+    const i = list.findIndex((v) => v.slug === slug);
+    return {
+      prev: i > 0 ? (list[i - 1] as Voiture) : null,
+      next: i >= 0 && i < list.length - 1 ? (list[i + 1] as Voiture) : null,
+      position: i + 1,
+      total: list.length,
+    };
+  }, [siblings, filters, slug]);
+
+  // La galerie repart de la première photo quand on change de châssis.
+  useEffect(() => {
+    setIndex(0);
+  }, [slug]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -53,6 +77,16 @@ function ChassisPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [photos.length]);
+
+  // Verrouille le défilement de la page pendant le zoom plein écran.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const previous = document.body.style.overflow;
+    if (zoom) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [zoom]);
 
   if (isLoading) return <div className="mx-auto max-w-7xl px-5 py-24 eyebrow">Chargement…</div>;
   if (!voiture) throw notFound();
@@ -75,15 +109,22 @@ function ChassisPage() {
     <article className="mx-auto max-w-7xl px-5 py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <Link to="/" className="eyebrow hover:text-foreground">
-        ← Registre
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Link to="/" search={filters} hash="registre" className="eyebrow hover:text-foreground">
+          ← Retour au registre
+        </Link>
+        <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} />
+      </div>
 
       <header className="mt-6 flex flex-wrap items-end justify-between gap-6 border-b border-border pb-8">
         <div>
-          <p className="eyebrow">{voiture.modele}</p>
+          <p className="eyebrow">
+            {voiture.modele}
+            {neighbours.total > 0 && ` · ${neighbours.position} / ${neighbours.total}`}
+          </p>
           <h1 className="mt-3 font-display text-4xl sm:text-5xl">{voiture.titre ?? voiture.modele}</h1>
         </div>
+
         <dl className="flex gap-10">
           <div>
             <dt className="eyebrow">Châssis</dt>
@@ -204,17 +245,51 @@ function ChassisPage() {
         </aside>
       </div>
 
+      <div className="mt-14 border-t border-border pt-6">
+        <Pager prev={neighbours.prev} next={neighbours.next} filters={filters} wide />
+      </div>
+
       {zoom && current && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-6"
           onClick={() => setZoom(false)}
+          role="dialog"
+          aria-modal="true"
         >
           <button className="absolute top-5 right-5 text-white" aria-label="Fermer">
             <X className="size-6" />
           </button>
+          {photos.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i - 1 + photos.length) % photos.length);
+                }}
+                className="absolute top-1/2 left-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                aria-label="Photo précédente"
+              >
+                <ChevronLeft className="size-8" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i + 1) % photos.length);
+                }}
+                className="absolute top-1/2 right-5 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                aria-label="Photo suivante"
+              >
+                <ChevronRight className="size-8" />
+              </button>
+              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs text-white/70">
+                {index + 1} / {photos.length}
+              </span>
+            </>
+          )}
           <img
             src={photoUrl(voiture.storage_path, current.filename)}
             alt=""
+            onClick={(e) => e.stopPropagation()}
             className="max-h-full max-w-full object-contain"
           />
         </div>
@@ -222,3 +297,51 @@ function ChassisPage() {
     </article>
   );
 }
+
+function Pager({
+  prev,
+  next,
+  filters,
+  wide = false,
+}: {
+  prev: Voiture | null;
+  next: Voiture | null;
+  filters: ReturnType<typeof Route.useSearch>;
+  wide?: boolean;
+}) {
+  if (!prev && !next) return null;
+  const base =
+    "inline-flex max-w-[45vw] items-center gap-2 border border-border px-4 py-2 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-primary hover:text-primary";
+  const label = (v: Voiture) => v.chassis ?? v.titre ?? v.modele ?? "—";
+
+  return (
+    <nav
+      aria-label="Navigation entre châssis"
+      className={cn("flex flex-wrap items-center gap-3", wide ? "justify-between" : "justify-end")}
+    >
+      {prev ? (
+        <Link to="/chassis/$slug" params={{ slug: prev.slug }} search={filters} className={base}>
+          <ChevronLeft className="size-3.5 shrink-0" />
+          <span className="truncate">{wide ? `Précédent · ${label(prev)}` : label(prev)}</span>
+        </Link>
+      ) : (
+        <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
+          <ChevronLeft className="size-3.5" />
+          <span>Précédent</span>
+        </span>
+      )}
+      {next ? (
+        <Link to="/chassis/$slug" params={{ slug: next.slug }} search={filters} className={base}>
+          <span className="truncate">{wide ? `Suivant · ${label(next)}` : label(next)}</span>
+          <ChevronRight className="size-3.5 shrink-0" />
+        </Link>
+      ) : (
+        <span className={cn(base, "pointer-events-none opacity-40")} aria-disabled>
+          <span>Suivant</span>
+          <ChevronRight className="size-3.5" />
+        </span>
+      )}
+    </nav>
+  );
+}
+
