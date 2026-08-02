@@ -27,6 +27,7 @@ const fr = {
   "nav.registerLabel": "Register",
   "lang.aria": "Langue de l'interface",
 
+  "footer.baseline": "Le registre mondial des châssis De Tomaso",
   "footer.registry": "Registre",
   "footer.archives": "Archives",
   "footer.access": "Accès",
@@ -200,6 +201,7 @@ const en: Dict = {
   "nav.registerLabel": "Register",
   "lang.aria": "Interface language",
 
+  "footer.baseline": "The world register of De Tomaso chassis",
   "footer.registry": "Register",
   "footer.archives": "Archives",
   "footer.access": "Access",
@@ -369,6 +371,7 @@ const it: Dict = {
   "nav.registerLabel": "Register",
   "lang.aria": "Lingua dell'interfaccia",
 
+  "footer.baseline": "Il registro mondiale dei telai De Tomaso",
   "footer.registry": "Registro",
   "footer.archives": "Archivi",
   "footer.access": "Accesso",
