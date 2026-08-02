@@ -97,6 +97,10 @@ function ChassisPage() {
 
   const current = photos[index];
   const history = (details?.[`description_${lang}`] ?? details?.description ?? "") as string;
+  const cover =
+    photos.find((p) => p.filename === voiture.cover_photo) ??
+    (voiture.cover_photo ? { filename: voiture.cover_photo } : photos[0]);
+  const specs = extractSpecs(history);
 
   const jsonLd = {
     "@context": "https://schema.org",
