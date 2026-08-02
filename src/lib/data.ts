@@ -116,13 +116,10 @@ export const booksQuery = queryOptions({
 });
 
 export const profilsQuery = queryOptions({
-  queryKey: ["profils", BRAND_SLUG],
+  queryKey: ["profils"],
   queryFn: () =>
     unwrap<Profil[]>(
-      supabase
-        .from("profils")
-        .select("*")
-        .eq("marque", BRAND_SLUG)
-        .order("created_at", { ascending: false }),
+      // Comptes partagés entre registres : pas de filtre marque.
+      supabase.from("profils").select("*").order("created_at", { ascending: false }),
     ),
 });
