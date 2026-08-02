@@ -26,7 +26,7 @@ export const Route = createFileRoute("/books")({
   component: Books,
 });
 
-function Cover({ book, large }: { book: Book; large?: boolean }) {
+function Cover({ book, large = false }: { book: Book; large?: boolean }) {
   return (
     <div
       className={`flex items-center justify-center overflow-hidden border border-border bg-secondary ${
@@ -49,7 +49,7 @@ function Cover({ book, large }: { book: Book; large?: boolean }) {
   );
 }
 
-function BookCard({ book, large }: { book: Book; large?: boolean }) {
+function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
   const content = (
     <>
       <Cover book={book} large={large} />
