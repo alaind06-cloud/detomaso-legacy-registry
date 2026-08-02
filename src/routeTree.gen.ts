@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as FondateurRouteImport } from './routes/fondateur'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
 
@@ -48,6 +49,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/fondateur'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/fondateur'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/fondateur'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   BooksRoute: typeof BooksRoute
   FondateurRoute: typeof FondateurRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VideosRoute: typeof VideosRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/videos': {
       id: '/videos'
       path: '/videos'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   BooksRoute: BooksRoute,
   FondateurRoute: FondateurRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   VideosRoute: VideosRoute,
   ChassisSlugRoute: ChassisSlugRoute,
 }
