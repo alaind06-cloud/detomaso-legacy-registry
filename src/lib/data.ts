@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BRAND_SLUG } from "@/lib/brand";
 import { referenceRank } from "@/lib/order";
 
-import type { Marque, Photo, Profil, Video, Voiture, VoitureDetails } from "@/lib/types";
+import type { Book, Marque, Photo, Profil, Video, Voiture, VoitureDetails } from "@/lib/types";
 
 async function unwrap<T>(p: PromiseLike<{ data: T | null; error: { message: string } | null }>): Promise<T> {
   const { data, error } = await p;
@@ -106,6 +106,14 @@ export function detailsQuery(voitureId: number | undefined) {
     },
   });
 }
+
+export const booksQuery = queryOptions({
+  queryKey: ["books"],
+  queryFn: () =>
+    unwrap<Book[]>(
+      supabase.from("books").select("*").order("ordre", { ascending: true, nullsFirst: false }).order("id"),
+    ),
+});
 
 export const profilsQuery = queryOptions({
   queryKey: ["profils", BRAND_SLUG],

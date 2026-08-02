@@ -3,7 +3,7 @@
  * Le code filtre toutes les requêtes sur cette valeur ("marque" en base),
  * ce qui permet la cohabitation de plusieurs registres dans un seul projet Supabase.
  */
-export const BRAND_SLUG = "de-tomaso";
+export const BRAND_SLUG = (import.meta.env["VITE_MARQUE"] as string | undefined) ?? "de-tomaso";
 
 export const BRAND = {
   slug: BRAND_SLUG,
