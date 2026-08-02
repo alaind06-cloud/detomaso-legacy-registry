@@ -1,4 +1,6 @@
+import { MODEL_GROUPS } from "@/lib/model-groups";
 import type { Voiture } from "@/lib/types";
+
 
 /** Filtres du registre, synchronisés dans l'URL (partageables + retour arrière fidèle). */
 export type RegistrySearch = {
