@@ -255,9 +255,11 @@ function ChassisPage() {
         <section className="border-t border-border bg-secondary/30">
           <div className="mx-auto max-w-7xl px-5 py-12">
             <div className="mb-6 flex items-end justify-between gap-4">
-              <h2 className="font-display text-3xl">Galerie</h2>
+              <h2 className="font-display text-3xl">{t("chassis.gallery")}</h2>
               <span className="eyebrow">
-                {photos.length} photographie{photos.length > 1 ? "s" : ""}
+                {t(photos.length > 1 ? "chassis.photos.other" : "chassis.photos.one", {
+                  n: photos.length,
+                })}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
@@ -269,8 +271,9 @@ function ChassisPage() {
                     setZoom(true);
                   }}
                   className="group aspect-square overflow-hidden border border-border bg-muted"
-                  aria-label={`Agrandir la photo ${i + 1}`}
+                  aria-label={`${t("chassis.enlarge")} ${i + 1}`}
                 >
+
                   <img
                     src={photoUrl(voiture.storage_path, p.filename)}
                     alt={`${voiture.titre ?? voiture.modele} — photo ${i + 1}`}
