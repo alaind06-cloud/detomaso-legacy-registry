@@ -29,12 +29,12 @@ export function parseRegistrySearch(search: Record<string, unknown>): RegistrySe
 }
 
 
-export function yearOf(annee: string | null): number | null {
-  const m = (annee ?? "").match(/\d{4}/);
+export function yearOf(annee: string | number | null | undefined): number | null {
+  const m = String(annee ?? "").match(/\d{4}/);
   return m ? Number(m[0]) : null;
 }
 
-export function decadeOf(annee: string | null): number | null {
+export function decadeOf(annee: string | number | null | undefined): number | null {
   const y = yearOf(annee);
   return y ? Math.floor(y / 10) * 10 : null;
 }
