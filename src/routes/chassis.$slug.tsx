@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
 import { detailsQuery, photosQuery, voitureBySlugQuery, voituresQuery } from "@/lib/data";
-import { photoUrl } from "@/lib/media";
+import { photoUrl, webpUrl } from "@/lib/media";
+import { PhotoPicture } from "@/components/site/PhotoPicture";
 import { BRAND } from "@/lib/brand";
 import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
@@ -146,12 +147,15 @@ function ChassisPage() {
           <figure className="border border-border bg-card p-2 sm:p-3">
             <div className="flex items-center justify-center overflow-hidden bg-muted">
               {cover ? (
-                <img
-                  src={photoUrl(voiture.storage_path, cover.filename)}
+                <PhotoPicture
+                  storagePath={voiture.storage_path}
+                  filename={cover.filename}
                   alt={voiture.titre ?? voiture.modele ?? "De Tomaso"}
-                  fetchPriority="high"
+                  priority
+                  sizes="(min-width: 1024px) 60vw, 100vw"
                   className="max-h-[64vh] w-full object-contain"
                 />
+
               ) : (
                 <div className="grid aspect-4/3 w-full place-items-center eyebrow">
                   {t("chassis.noPhoto")}
@@ -274,13 +278,16 @@ function ChassisPage() {
                   aria-label={`${t("chassis.enlarge")} ${i + 1}`}
                 >
 
-                  <img
-                    src={photoUrl(voiture.storage_path, p.filename)}
+                  <PhotoPicture
+                    storagePath={voiture.storage_path}
+                    filename={p.filename}
                     alt={`${voiture.titre ?? voiture.modele} — photo ${i + 1}`}
-                    loading="lazy"
-                    decoding="async"
+                    width={400}
+                    height={400}
+                    sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 45vw"
                     className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+
                 </button>
               ))}
             </div>
@@ -329,12 +336,15 @@ function ChassisPage() {
               </span>
             </>
           )}
-          <img
-            src={photoUrl(voiture.storage_path, current.filename)}
-            alt=""
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full object-contain"
-          />
+          <picture onClick={(e) => e.stopPropagation()} className="contents">
+            <source srcSet={webpUrl(voiture.storage_path, current.filename)} type="image/webp" />
+            <img
+              src={photoUrl(voiture.storage_path, current.filename)}
+              alt=""
+              className="max-h-full max-w-full object-contain"
+            />
+          </picture>
+
         </div>
       )}
     </article>

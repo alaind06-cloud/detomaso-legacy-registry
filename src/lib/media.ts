@@ -21,3 +21,9 @@ export function photoUrl(storagePath: string | null | undefined, filename: strin
   const full = `${dir}${filename}`;
   return `${MEDIA_BASE_URL}/${encodePath(full)}`;
 }
+
+/** Même chemin, extension .webp (une variante WebP existe pour chaque photo). */
+export function webpUrl(storagePath: string | null | undefined, filename: string | null | undefined) {
+  if (!filename) return "";
+  return photoUrl(storagePath, filename.replace(/\.(jpe?g|png)$/i, "") + ".webp");
+}

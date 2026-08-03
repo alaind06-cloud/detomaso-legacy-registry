@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import heroImage from "@/assets/hero-detomaso.jpg";
 import { voituresQuery } from "@/lib/data";
-import { photoUrl } from "@/lib/media";
+import { PhotoPicture } from "@/components/site/PhotoPicture";
 import { BRAND } from "@/lib/brand";
 import {
   PAGE_SIZE,
@@ -306,12 +306,17 @@ function CarCard({
     >
       <div className="relative aspect-4/3 overflow-hidden bg-muted">
         {v.cover_photo ? (
-          <img
-            src={photoUrl(v.storage_path, v.cover_photo)}
+          <PhotoPicture
+            storagePath={v.storage_path}
+            filename={v.cover_photo}
             alt={v.titre ?? `${t("chassis.plate")} ${v.chassis}`}
-            loading={priority ? "eager" : "lazy"}
+            priority={priority}
+            width={640}
+            height={480}
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
             className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
+
         ) : (
           <div className="flex size-full items-center justify-center eyebrow">
             {t("home.noVisual")}
