@@ -20,7 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Languages, RotateCw, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { detailsQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
+import { detailsQuery, marquesQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { translateHistory } from "@/lib/translate.functions";
