@@ -31,7 +31,8 @@ export function PhotoPicture({
   const webp = webpUrl(storagePath, filename);
 
   return (
-    <picture>
+    <picture className="contents">
+
       <source srcSet={webp} type="image/webp" {...(sizes ? { sizes } : {})} />
       <img
         src={jpg}
