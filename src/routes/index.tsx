@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import heroImage from "@/assets/hero-detomaso.jpg";
 import { voituresQuery } from "@/lib/data";
-import { photoUrl } from "@/lib/media";
+import { PhotoPicture } from "@/components/site/PhotoPicture";
 import { BRAND } from "@/lib/brand";
 import {
   PAGE_SIZE,
