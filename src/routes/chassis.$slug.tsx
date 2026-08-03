@@ -278,13 +278,16 @@ function ChassisPage() {
                   aria-label={`${t("chassis.enlarge")} ${i + 1}`}
                 >
 
-                  <img
-                    src={photoUrl(voiture.storage_path, p.filename)}
+                  <PhotoPicture
+                    storagePath={voiture.storage_path}
+                    filename={p.filename}
                     alt={`${voiture.titre ?? voiture.modele} — photo ${i + 1}`}
-                    loading="lazy"
-                    decoding="async"
+                    width={400}
+                    height={400}
+                    sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 45vw"
                     className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+
                 </button>
               ))}
             </div>
