@@ -336,12 +336,15 @@ function ChassisPage() {
               </span>
             </>
           )}
-          <img
-            src={photoUrl(voiture.storage_path, current.filename)}
-            alt=""
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full object-contain"
-          />
+          <picture onClick={(e) => e.stopPropagation()} className="contents">
+            <source srcSet={webpUrl(voiture.storage_path, current.filename)} type="image/webp" />
+            <img
+              src={photoUrl(voiture.storage_path, current.filename)}
+              alt=""
+              className="max-h-full max-w-full object-contain"
+            />
+          </picture>
+
         </div>
       )}
     </article>
