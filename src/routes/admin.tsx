@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Languages, RotateCw, Sparkles } from "lucide-react";
+import { GripVertical, Languages, Lock, RotateCw, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { detailsQuery, marquesQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
@@ -243,93 +243,52 @@ function Membres() {
 /* ---------------- Châssis & ordre ---------------- */
 
 function Chassis({ onEdit }: { onEdit: (v: Voiture) => void }) {
-  const qc = useQueryClient();
   const { data: voitures = [] } = useQuery(voituresQuery);
-  const [items, setItems] = useState<Voiture[]>([]);
   const [creating, setCreating] = useState(false);
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  useEffect(() => setItems(voitures), [voitures]);
-
-  const saveOrder = useMutation({
-    mutationFn: async (list: Voiture[]) => {
-      for (let i = 0; i < list.length; i++) {
-        const { error } = await supabase
-          .from("voitures")
-          .update({ ordre_affichage: i + 1 })
-          .eq("id", list[i]!.id);
-        if (error) throw new Error(error.message);
-      }
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["voitures", BRAND_SLUG] });
-      toast.success("Ordre enregistré");
-    },
-    onError: (e) => toast.error((e as Error).message),
-  });
-
-  function onDragEnd(e: DragEndEvent) {
-    const { active, over } = e;
-    if (!over || active.id === over.id) return;
-    setItems((list) => {
-      const from = list.findIndex((v) => v.id === active.id);
-      const to = list.findIndex((v) => v.id === over.id);
-      return arrayMove(list, from, to);
-    });
-  }
-
+  // NOTE : le glisser-déposer est temporairement verrouillé car l'ordre actuel
+  // (ordre_affichage) a été validé. Pour réactiver, restaurer DndContext +
+  // SortableContext + useSortable dans la liste ci-dessous.
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-2xl">{items.length} châssis</h2>
-        <div className="flex gap-2">
+        <h2 className="font-display text-2xl">{voitures.length} châssis</h2>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Lock className="size-3.5" />
+            Ordre verrouillé
+          </span>
           <button
             onClick={() => setCreating((c) => !c)}
             className="border border-border bg-background px-4 py-2 text-xs uppercase tracking-[0.16em]"
           >
             {creating ? "Annuler" : "Ajouter un châssis"}
           </button>
-          <button
-            onClick={() => saveOrder.mutate(items)}
-            disabled={saveOrder.isPending}
-            className="bg-primary px-4 py-2 text-xs uppercase tracking-[0.16em] text-primary-foreground"
-          >
-            Enregistrer l'ordre
-          </button>
         </div>
       </div>
 
       {creating && <NewChassis onDone={() => setCreating(false)} />}
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((v) => v.id)} strategy={verticalListSortingStrategy}>
-          <ul className="space-y-2">
-            {items.map((v) => (
-              <SortableRow key={v.id} voiture={v} onEdit={onEdit} />
-            ))}
-          </ul>
-        </SortableContext>
-      </DndContext>
+      <p className="mb-4 text-sm text-muted-foreground">
+        La réorganisation du catalogue est temporairement verrouillée. L'ordre affiché ci-dessous
+        correspond à l'ordre validé du site d'origine.
+      </p>
+
+      <ul className="space-y-2">
+        {voitures.map((v) => (
+          <ReadOnlyRow key={v.id} voiture={v} onEdit={onEdit} />
+        ))}
+      </ul>
     </div>
   );
 }
 
-function SortableRow({ voiture, onEdit }: { voiture: Voiture; onEdit: (v: Voiture) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: voiture.id,
-  });
+function ReadOnlyRow({ voiture, onEdit }: { voiture: Voiture; onEdit: (v: Voiture) => void }) {
   return (
-    <li
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(
-        "flex items-center gap-4 border border-border bg-background p-3",
-        isDragging && "opacity-70",
-      )}
-    >
-      <button {...attributes} {...listeners} className="cursor-grab text-muted-foreground">
-        <GripVertical className="size-4" />
-      </button>
+    <li className="flex items-center gap-4 border border-border bg-background p-3">
+      <span className="text-muted-foreground/60">
+        <Lock className="size-4" />
+      </span>
       <div className="size-14 shrink-0 overflow-hidden bg-muted">
         {voiture.cover_photo && (
           <img
