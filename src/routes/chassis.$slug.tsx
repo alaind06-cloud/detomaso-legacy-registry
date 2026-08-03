@@ -146,12 +146,15 @@ function ChassisPage() {
           <figure className="border border-border bg-card p-2 sm:p-3">
             <div className="flex items-center justify-center overflow-hidden bg-muted">
               {cover ? (
-                <img
-                  src={photoUrl(voiture.storage_path, cover.filename)}
+                <PhotoPicture
+                  storagePath={voiture.storage_path}
+                  filename={cover.filename}
                   alt={voiture.titre ?? voiture.modele ?? "De Tomaso"}
-                  fetchPriority="high"
+                  priority
+                  sizes="(min-width: 1024px) 60vw, 100vw"
                   className="max-h-[64vh] w-full object-contain"
                 />
+
               ) : (
                 <div className="grid aspect-4/3 w-full place-items-center eyebrow">
                   {t("chassis.noPhoto")}
