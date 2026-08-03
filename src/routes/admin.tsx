@@ -20,7 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Languages, RotateCw, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { detailsQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
+import { detailsQuery, marquesQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
 import { photoUrl } from "@/lib/media";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { translateHistory } from "@/lib/translate.functions";
@@ -118,6 +118,19 @@ function Admin() {
 function Membres() {
   const qc = useQueryClient();
   const { data: profils = [], isLoading } = useQuery(profilsQuery);
+  const { data: marques = [] } = useQuery(marquesQuery);
+  const [marqueFilter, setMarqueFilter] = useState<string>("all");
+
+  const marqueMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const m of marques) map.set(m.slug, m.nom_affichage ?? m.slug);
+    return map;
+  }, [marques]);
+
+  const filtered = useMemo(() => {
+    if (marqueFilter === "all") return profils;
+    return profils.filter((p) => p.marque === marqueFilter);
+  }, [profils, marqueFilter]);
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
@@ -134,70 +147,95 @@ function Membres() {
   if (isLoading) return <p className="eyebrow">Chargement…</p>;
 
   return (
-    <div className="border border-border bg-background">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border text-left">
-            {["Membre", "Contact", "Motivation", "Statut", "Actions"].map((h) => (
-              <th key={h} className="px-4 py-3 eyebrow">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {profils.map((p) => (
-            <tr key={p.id} className="border-b border-border/70 align-top">
-              <td className="px-4 py-3">
-                <div className="font-medium">
-                  {p.prenom} {p.nom}
-                </div>
-                {p.est_admin && <span className="text-xs text-primary">Administrateur</span>}
-              </td>
-              <td className="px-4 py-3 text-muted-foreground">
-                <div>{p.email}</div>
-                <div>{p.telephone}</div>
-              </td>
-              <td className="max-w-xs px-4 py-3 text-muted-foreground">{p.raison}</td>
-              <td className="px-4 py-3">
-                <span
-                  className={cn(
-                    "px-2 py-1 text-xs",
-                    p.statut === "valide" && "bg-primary/10 text-primary",
-                    p.statut === "en_attente" && "bg-muted text-muted-foreground",
-                    p.statut === "refuse" && "bg-destructive/10 text-destructive",
-                  )}
-                >
-                  {p.statut}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => update.mutate({ id: p.id, patch: { statut: "valide" } })}
-                    className="bg-primary px-3 py-1.5 text-xs text-primary-foreground"
-                  >
-                    Valider
-                  </button>
-                  <button
-                    onClick={() => update.mutate({ id: p.id, patch: { statut: "refuse" } })}
-                    className="border border-border px-3 py-1.5 text-xs"
-                  >
-                    Refuser
-                  </button>
-                  <button
-                    onClick={() => update.mutate({ id: p.id, patch: { est_admin: !p.est_admin } })}
-                    className="border border-border px-3 py-1.5 text-xs"
-                  >
-                    {p.est_admin ? "Retirer admin" : "Nommer admin"}
-                  </button>
-                </div>
-              </td>
-            </tr>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <label htmlFor="marque-filter" className="eyebrow">
+          Filtrer par marque
+        </label>
+        <select
+          id="marque-filter"
+          value={marqueFilter}
+          onChange={(e) => setMarqueFilter(e.target.value)}
+          className="h-9 border border-border bg-background px-3 text-sm outline-none focus:border-primary"
+        >
+          <option value="all">Toutes les marques</option>
+          {marques.map((m) => (
+            <option key={m.slug} value={m.slug}>
+              {m.nom_affichage ?? m.slug}
+            </option>
           ))}
-        </tbody>
-      </table>
-      {profils.length === 0 && <p className="p-6 text-sm text-muted-foreground">Aucun membre.</p>}
+        </select>
+        <span className="ml-auto text-xs text-muted-foreground">{filtered.length} membre(s)</span>
+      </div>
+
+      <div className="border border-border bg-background">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left">
+              {["Membre", "Contact", "Marque", "Motivation", "Statut", "Actions"].map((h) => (
+                <th key={h} className="px-4 py-3 eyebrow">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((p) => (
+              <tr key={p.id} className="border-b border-border/70 align-top">
+                <td className="px-4 py-3">
+                  <div className="font-medium">
+                    {p.prenom} {p.nom}
+                  </div>
+                  {p.est_admin && <span className="text-xs text-primary">Administrateur</span>}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  <div>{p.email}</div>
+                  <div>{p.telephone}</div>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {marqueMap.get(p.marque) ?? p.marque}
+                </td>
+                <td className="max-w-xs px-4 py-3 text-muted-foreground">{p.raison}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={cn(
+                      "px-2 py-1 text-xs",
+                      p.statut === "valide" && "bg-primary/10 text-primary",
+                      p.statut === "en_attente" && "bg-muted text-muted-foreground",
+                      p.statut === "refuse" && "bg-destructive/10 text-destructive",
+                    )}
+                  >
+                    {p.statut}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => update.mutate({ id: p.id, patch: { statut: "valide" } })}
+                      className="bg-primary px-3 py-1.5 text-xs text-primary-foreground"
+                    >
+                      Valider
+                    </button>
+                    <button
+                      onClick={() => update.mutate({ id: p.id, patch: { statut: "refuse" } })}
+                      className="border border-border px-3 py-1.5 text-xs"
+                    >
+                      Refuser
+                    </button>
+                    <button
+                      onClick={() => update.mutate({ id: p.id, patch: { est_admin: !p.est_admin } })}
+                      className="border border-border px-3 py-1.5 text-xs"
+                    >
+                      {p.est_admin ? "Retirer admin" : "Nommer admin"}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {filtered.length === 0 && <p className="p-6 text-sm text-muted-foreground">Aucun membre.</p>}
+      </div>
     </div>
   );
 }

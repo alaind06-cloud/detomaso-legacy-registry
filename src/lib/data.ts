@@ -47,6 +47,14 @@ export const marqueQuery = queryOptions({
   },
 });
 
+export const marquesQuery = queryOptions({
+  queryKey: ["marques"],
+  queryFn: () =>
+    unwrap<Marque[]>(
+      supabase.from("marques").select("*").order("ordre", { ascending: true, nullsFirst: false }).order("id"),
+    ),
+});
+
 export const videosQuery = queryOptions({
   queryKey: ["videos", BRAND_SLUG],
   queryFn: () =>
