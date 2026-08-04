@@ -14,7 +14,7 @@ const has = (...words: string[]) => (v: Voiture) => words.some((w) => hay(v).inc
 
 export const MODEL_GROUPS: ModelGroup[] = [
   { key: "pantera", label: "Pantera", test: has("pantera") },
-  { key: "mangusta", label: "Mangusta", test: has("mangusta") },
+  
   { key: "vallelunga", label: "Vallelunga", test: has("vallelunga") },
   { key: "deauville", label: "Deauville", test: has("deauville") },
   { key: "longchamp", label: "Longchamp", test: has("longchamp") },
