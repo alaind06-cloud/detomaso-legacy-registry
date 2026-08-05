@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BRAND } from "@/lib/brand";
 import { useT, type TKey } from "@/lib/i18n";
 
+const PORTRAIT_URL =
+  "https://upload.wikimedia.org/wikipedia/commons/9/95/Alejandro_detomaso.jpg";
+
 export const Route = createFileRoute("/fondateur")({
   head: () => ({
     meta: [
@@ -17,6 +20,10 @@ export const Route = createFileRoute("/fondateur")({
         content: "Portrait du fondateur et regard d'expert sur les automobiles De Tomaso.",
       },
       { property: "og:url", content: `${BRAND.siteUrl}/fondateur` },
+      { property: "og:image", content: PORTRAIT_URL },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: PORTRAIT_URL },
     ],
     links: [{ rel: "canonical", href: `${BRAND.siteUrl}/fondateur` }],
   }),
