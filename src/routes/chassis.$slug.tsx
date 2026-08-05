@@ -9,7 +9,7 @@ import { BRAND } from "@/lib/brand";
 import { hasFilters, matchesFilters, parseRegistrySearch } from "@/lib/filters";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { useT } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n";
 import { extractSpecs } from "@/lib/chassis-specs";
 import { SpecsBlock } from "@/components/site/SpecsBlock";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
