@@ -53,7 +53,6 @@ function ChassisPage() {
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [mode, setMode] = useState<"summary" | "full">("full");
-  const [showTranslation, setShowTranslation] = useState(false);
 
 
   const canSeeDetails = isMember || isAdmin;
@@ -108,7 +107,7 @@ function ChassisPage() {
   const translated =
     lang === "fr" ? (details?.description_fr ?? "") : lang === "it" ? (details?.description_it ?? "") : "";
   const canTranslate = lang !== "en" && Boolean(translated.trim());
-  const displayed = showTranslation && canTranslate ? translated : history;
+  const displayed = canTranslate ? translated : history;
 
   const cover =
     photos.find((p) => p.filename === voiture.cover_photo) ??
