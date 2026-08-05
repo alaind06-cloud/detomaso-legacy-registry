@@ -44,7 +44,7 @@ export const Route = createFileRoute("/chassis/$slug")({
 function ChassisPage() {
   const { slug } = Route.useParams();
   const filters = Route.useSearch();
-  const t = useT();
+  const { t, lang } = useI18n();
   const { isMember, isAdmin, loading } = useAuth();
   const { data: voiture, isLoading } = useQuery(voitureBySlugQuery(slug));
   const { data: photos = [] } = useQuery(photosQuery(voiture?.id));
@@ -53,6 +53,7 @@ function ChassisPage() {
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [mode, setMode] = useState<"summary" | "full">("full");
+  const [showTranslation, setShowTranslation] = useState(false);
 
 
   const canSeeDetails = isMember || isAdmin;
@@ -103,6 +104,11 @@ function ChassisPage() {
   const current = photos[index];
   // Contenu documentaire d'origine (anglais) : jamais localisé.
   const history = (details?.description_en ?? details?.description ?? "") as string;
+  // Traduction disponible dans la langue active (le texte source reste intact).
+  const translated =
+    lang === "fr" ? (details?.description_fr ?? "") : lang === "it" ? (details?.description_it ?? "") : "";
+  const canTranslate = lang !== "en" && Boolean(translated.trim());
+  const displayed = showTranslation && canTranslate ? translated : history;
 
   const cover =
     photos.find((p) => p.filename === voiture.cover_photo) ??
@@ -208,6 +214,27 @@ function ChassisPage() {
             </p>
           </div>
           {canSeeDetails && history.trim() && (
+            <div className="flex flex-wrap items-center gap-3">
+            {canTranslate && (
+              <div className="inline-flex overflow-hidden border border-border text-[11px]">
+                {([false, true] as const).map((v) => (
+                  <button
+                    key={String(v)}
+                    onClick={() => setShowTranslation(v)}
+                    aria-pressed={showTranslation === v}
+                    className={cn(
+                      "px-3 py-1.5 tracking-[0.16em] uppercase transition-colors",
+                      v && "border-l border-border",
+                      showTranslation === v
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:text-primary",
+                    )}
+                  >
+                    {v ? `${t("chassis.lang.translated")} · ${lang.toUpperCase()}` : t("chassis.lang.original")}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="inline-flex overflow-hidden border border-border text-[11px]">
               {(["summary", "full"] as const).map((m) => (
                 <button
@@ -224,6 +251,7 @@ function ChassisPage() {
                 </button>
               ))}
             </div>
+            </div>
           )}
         </div>
 
@@ -231,7 +259,7 @@ function ChassisPage() {
           <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
         ) : canSeeDetails ? (
           <HistoryTimeline
-            description={history}
+            description={displayed}
             mode={mode}
             modele={voiture.modele}
             annee={voiture.annee}
@@ -363,7 +391,7 @@ function Pager({
   filters: ReturnType<typeof Route.useSearch>;
   wide?: boolean;
 }) {
-  const t = useT();
+  const { t } = useI18n();
   if (!prev && !next) return null;
   const base =
     "inline-flex max-w-[45vw] items-center gap-2 border border-border px-4 py-2 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-primary hover:text-primary";
