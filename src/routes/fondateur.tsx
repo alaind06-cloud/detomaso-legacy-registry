@@ -85,6 +85,7 @@ const TIMELINE: Array<{ year: string; key: TKey }> = [
   { year: "1963", key: "founder.t1963" },
   { year: "1967", key: "founder.t1967" },
   { year: "1971", key: "founder.t1971" },
+  { year: "1975", key: "founder.t1975" },
   { year: "1976", key: "founder.t1976" },
   { year: "1993", key: "founder.t1993" },
 ];
