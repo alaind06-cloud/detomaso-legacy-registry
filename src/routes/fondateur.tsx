@@ -50,6 +50,23 @@ function Fondateur() {
       <h1 className="mt-4 font-display text-4xl sm:text-6xl">{BRAND.founder.name}</h1>
       <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{t("founder.intro")}</p>
 
+      <figure className="mt-10">
+        <div className="overflow-hidden rounded-sm border border-border bg-muted shadow-sm">
+          <img
+            src={PORTRAIT_URL}
+            alt="Portrait d'Alejandro de Tomaso, fondateur de De Tomaso, vers 1965"
+            width={640}
+            height={800}
+            loading="eager"
+            fetchPriority="high"
+            className="mx-auto max-h-[70vh] w-auto object-contain"
+          />
+        </div>
+        <figcaption className="mt-3 text-center text-xs text-muted-foreground">
+          Crédit photo : Wikimedia Commons — Domaine public
+        </figcaption>
+      </figure>
+
       <div className="mt-16 border-t border-border">
         {TIMELINE.map((item) => (
           <div
