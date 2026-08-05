@@ -232,7 +232,6 @@ function ChassisPage() {
                 </button>
               ))}
             </div>
-            </div>
           )}
         </div>
 
