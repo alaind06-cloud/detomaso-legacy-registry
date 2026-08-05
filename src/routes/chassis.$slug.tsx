@@ -53,7 +53,6 @@ function ChassisPage() {
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [mode, setMode] = useState<"summary" | "full">("full");
-  const [showTranslation, setShowTranslation] = useState(false);
 
 
   const canSeeDetails = isMember || isAdmin;
@@ -108,7 +107,7 @@ function ChassisPage() {
   const translated =
     lang === "fr" ? (details?.description_fr ?? "") : lang === "it" ? (details?.description_it ?? "") : "";
   const canTranslate = lang !== "en" && Boolean(translated.trim());
-  const displayed = showTranslation && canTranslate ? translated : history;
+  const displayed = canTranslate ? translated : history;
 
   const cover =
     photos.find((p) => p.filename === voiture.cover_photo) ??
@@ -210,31 +209,12 @@ function ChassisPage() {
           <div>
             <h2 className="font-display text-3xl">{t("chassis.history")}</h2>
             <p className="mt-1 text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
-              {t("chassis.history.note")}
+              {canTranslate
+                ? `${t("chassis.lang.translated")} · ${lang.toUpperCase()}`
+                : t("chassis.history.note")}
             </p>
           </div>
           {canSeeDetails && history.trim() && (
-            <div className="flex flex-wrap items-center gap-3">
-            {canTranslate && (
-              <div className="inline-flex overflow-hidden border border-border text-[11px]">
-                {([false, true] as const).map((v) => (
-                  <button
-                    key={String(v)}
-                    onClick={() => setShowTranslation(v)}
-                    aria-pressed={showTranslation === v}
-                    className={cn(
-                      "px-3 py-1.5 tracking-[0.16em] uppercase transition-colors",
-                      v && "border-l border-border",
-                      showTranslation === v
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:text-primary",
-                    )}
-                  >
-                    {v ? `${t("chassis.lang.translated")} · ${lang.toUpperCase()}` : t("chassis.lang.original")}
-                  </button>
-                ))}
-              </div>
-            )}
             <div className="inline-flex overflow-hidden border border-border text-[11px]">
               {(["summary", "full"] as const).map((m) => (
                 <button
@@ -250,7 +230,6 @@ function ChassisPage() {
                   {m === "summary" ? t("chassis.view.summary") : t("chassis.view.full")}
                 </button>
               ))}
-            </div>
             </div>
           )}
         </div>
