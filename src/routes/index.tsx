@@ -123,19 +123,16 @@ function Home() {
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-border">
-        <picture>
-          <source srcSet={heroImageWebp} type="image/webp" />
-          <img
-            src={heroImage}
-            alt={t("home.heroAlt")}
-            width={1920}
-            height={1088}
-            fetchPriority="high"
-            decoding="sync"
-            className="absolute inset-0 size-full object-cover"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/20" />
+        <img
+          src={heroAsset.url}
+          alt={t("home.heroAlt")}
+          fetchPriority="high"
+          decoding="sync"
+          className="hero-kenburns absolute inset-0 size-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_180px_60px_hsl(var(--background)/0.9)]" />
         <div className="relative mx-auto max-w-7xl px-5 py-28 sm:py-36">
           <p className="eyebrow">{t("home.eyebrow")}</p>
           <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] sm:text-7xl">
