@@ -123,13 +123,18 @@ function Home() {
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-border">
-        <img
-          src={heroImage}
-          alt={t("home.heroAlt")}
-          width={1920}
-          height={1088}
-          className="absolute inset-0 size-full object-cover"
-        />
+        <picture>
+          <source srcSet={heroImageWebp} type="image/webp" />
+          <img
+            src={heroImage}
+            alt={t("home.heroAlt")}
+            width={1920}
+            height={1088}
+            fetchPriority="high"
+            decoding="sync"
+            className="absolute inset-0 size-full object-cover"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/20" />
         <div className="relative mx-auto max-w-7xl px-5 py-28 sm:py-36">
           <p className="eyebrow">{t("home.eyebrow")}</p>
