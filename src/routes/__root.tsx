@@ -88,7 +88,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "preconnect",
         href: "https://pub-5d4df75020194b5d8aaf953bd0696401.r2.dev",
-        crossOrigin: "anonymous",
       },
       {
         rel: "preload",
