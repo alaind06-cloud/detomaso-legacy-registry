@@ -451,6 +451,7 @@ function PhotoManager({ voiture }: { voiture: Voiture }) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["voitures", BRAND_SLUG] });
+      qc.invalidateQueries({ queryKey: ["voiture", BRAND_SLUG, voiture.slug] });
       toast.success("Photo de couverture définie");
     },
     onError: (e) => toast.error((e as Error).message),
