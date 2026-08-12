@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import heroImage from "@/assets/hero-detomaso.jpg";
+import heroImageWebp from "@/assets/hero-detomaso.webp";
 import { voituresQuery } from "@/lib/data";
 import { PhotoPicture } from "@/components/site/PhotoPicture";
 import { BRAND } from "@/lib/brand";
