@@ -10,7 +10,7 @@ export const BRAND = {
   name: "De Tomaso",
   registerName: "De Tomaso Register",
   baseline: "Le registre mondial des châssis De Tomaso",
-  siteUrl: "https://registerdetomaso.com",
+  siteUrl: "https://www.registerdetomaso.com",
   founder: {
     name: "Alejandro de Tomaso",
     role: "Fondateur",
