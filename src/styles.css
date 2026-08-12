@@ -185,3 +185,25 @@
   );
 }
 
+
+@utility hero-kenburns {
+  animation: hero-kenburns 22s ease-out forwards;
+  filter: saturate(1.05) contrast(1.06);
+}
+
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1.12) translate3d(1.5%, 1%, 0);
+  }
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+@utility hero-vignette {
+  background: radial-gradient(
+    120% 90% at 60% 45%,
+    transparent 35%,
+    color-mix(in oklab, var(--color-background) 85%, transparent) 100%
+  );
+}
