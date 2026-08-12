@@ -15,7 +15,7 @@ export const BRAND = {
     name: "Alejandro de Tomaso",
     role: "Fondateur",
   },
-  contactEmail: "contact@registerdetomaso.com",
+  contactEmail: "registerdetomaso@gmail.com",
 } as const;
 
 /** Langues supportées pour les historiques de châssis. */
