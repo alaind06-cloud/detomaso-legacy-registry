@@ -8,11 +8,11 @@ const PORTRAIT_URL =
 const PERSON_JSONLD = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "@id": "https://detomaso-legacy-registry.vercel.app/fondateur#person",
+  "@id": "https://www.registerdetomaso.com/fondateur#person",
   name: "Alejandro de Tomaso",
   givenName: "Alejandro",
   familyName: "de Tomaso",
-  url: "https://detomaso-legacy-registry.vercel.app/fondateur",
+  url: "https://www.registerdetomaso.com/fondateur",
   birthDate: "1928-07-10",
   deathDate: "2003-05-21",
   birthPlace: {
