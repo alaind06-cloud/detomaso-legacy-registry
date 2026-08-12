@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Languages, Lock, RotateCw, Sparkles } from "lucide-react";
+import { Check, GripVertical, Languages, Lock, RotateCw, Sparkles, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { detailsQuery, marquesQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
