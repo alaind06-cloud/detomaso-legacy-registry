@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Languages, Lock, RotateCw, Sparkles } from "lucide-react";
+import { Check, GripVertical, Languages, Lock, RotateCw, Sparkles, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { detailsQuery, marquesQuery, photosQuery, profilsQuery, voituresQuery } from "@/lib/data";
@@ -451,6 +451,7 @@ function PhotoManager({ voiture }: { voiture: Voiture }) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["voitures", BRAND_SLUG] });
+      qc.invalidateQueries({ queryKey: ["voiture", BRAND_SLUG, voiture.slug] });
       toast.success("Photo de couverture définie");
     },
     onError: (e) => toast.error((e as Error).message),
@@ -521,7 +522,10 @@ function SortablePhoto({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="border border-border bg-background"
+      className={cn(
+        "border bg-background transition-colors",
+        isCover ? "border-primary ring-2 ring-primary/40" : "border-border",
+      )}
     >
       <div className="relative aspect-square bg-muted" {...attributes} {...listeners}>
         <img
@@ -531,22 +535,39 @@ function SortablePhoto({
           className="size-full cursor-grab object-cover"
         />
         {isCover && (
-          <span className="absolute top-1 left-1 bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
-            Couverture
+          <span className="absolute top-1 left-1 inline-flex items-center gap-1 bg-primary px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] text-primary-foreground">
+            <Check className="size-3" />
+            Couverture actuelle
           </span>
         )}
       </div>
       <div className="flex gap-1 p-1">
-        <button onClick={onCover} className="flex-1 border border-border py-1 text-[10px] uppercase">
-          Couverture
+        <button
+          onClick={onCover}
+          disabled={isCover}
+          title={isCover ? "Photo de couverture actuelle" : "Définir comme couverture"}
+          aria-label={isCover ? "Photo de couverture actuelle" : "Définir comme couverture"}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-1 border py-1 text-[10px] uppercase transition-colors",
+            isCover
+              ? "cursor-default border-primary bg-primary/10 text-primary"
+              : "border-border hover:border-primary hover:text-primary",
+          )}
+        >
+          <Star className={cn("size-3", isCover && "fill-current")} />
+          {isCover ? "Couverture" : "Définir"}
         </button>
-        <button onClick={onEdit} className="flex-1 border border-border py-1 text-[10px] uppercase">
+        <button
+          onClick={onEdit}
+          className="flex-1 border border-border py-1 text-[10px] uppercase hover:border-primary hover:text-primary"
+        >
           Retoucher
         </button>
       </div>
     </li>
   );
 }
+
 
 function PhotoEditor({
   photo,
