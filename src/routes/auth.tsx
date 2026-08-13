@@ -129,58 +129,29 @@ function AuthPage() {
   }
 
   return (
-    <Shell title={mode === "login" ? t("auth.login") : t("auth.signup")}>
-      <div className="mb-8 flex gap-2">
-        {(["login", "signup"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`border px-4 py-2 text-[11px] uppercase tracking-[0.18em] ${
-              mode === m ? "border-primary bg-primary text-primary-foreground" : "border-border"
-            }`}
-          >
-            {m === "login" ? t("auth.tab.login") : t("auth.tab.signup")}
-          </button>
-        ))}
-      </div>
-
-      <form onSubmit={submit} className="space-y-4">
-        {mode === "signup" && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field
-              label={t("auth.firstname")}
-              value={form.prenom}
-              onChange={(v) => set("prenom", v)}
-              required
-            />
-            <Field
-              label={t("auth.lastname")}
-              value={form.nom}
-              onChange={(v) => set("nom", v)}
-              required
-            />
-          </div>
-        )}
-        <Field
-          label={t("auth.email")}
-          type="email"
-          value={form.email}
-          onChange={(v) => set("email", v)}
-          required
-        />
-        <Field
-          label={t("auth.password")}
-          type="password"
-          value={form.password}
-          onChange={(v) => set("password", v)}
-          required
-        />
+    <Shell title={mode === "login" ? t("auth.login") : t("auth.signupTitle")}>
+      <form onSubmit={submit} className="space-y-5">
         {mode === "signup" && (
           <>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label={t("auth.firstname")}
+                value={form.prenom}
+                onChange={(v) => set("prenom", v)}
+                required
+              />
+              <Field
+                label={t("auth.lastname")}
+                value={form.nom}
+                onChange={(v) => set("nom", v)}
+                required
+              />
+            </div>
             <Field
               label={t("auth.phone")}
               value={form.telephone}
               onChange={(v) => set("telephone", v)}
+              required
             />
             <label className="block">
               <span className="eyebrow">{t("auth.reason")}</span>
@@ -212,33 +183,67 @@ function AuthPage() {
             )}
           </>
         )}
+        <Field
+          label={t("auth.email")}
+          type="email"
+          value={form.email}
+          onChange={(v) => set("email", v)}
+          required
+        />
+        <Field
+          label={t("auth.password")}
+          type="password"
+          value={form.password}
+          onChange={(v) => set("password", v)}
+          required
+        />
         <button
           type="submit"
           disabled={busy}
-          className="w-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground disabled:opacity-60"
+          className="w-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {busy ? "…" : mode === "login" ? t("auth.submit.login") : t("auth.submit.signup")}
+          {busy ? "…" : mode === "login" ? t("auth.tab.login") : t("auth.createAccount")}
         </button>
       </form>
 
-      {mode === "login" && (
-        <button
-          onClick={async () => {
-            if (!form.email.trim()) {
-              toast.error(t("auth.toast.needEmail"));
-              return;
-            }
-            const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
-              redirectTo: `${window.location.origin}/reset-password`,
-            });
-            if (error) toast.error(error.message);
-            else toast.success(t("auth.toast.resetSent"));
-          }}
-          className="mt-5 text-xs text-muted-foreground underline underline-offset-4"
-        >
-          {t("auth.forgot")}
-        </button>
-      )}
+      <div className="mt-7 border-t border-border pt-5 text-center">
+        {mode === "login" ? (
+          <>
+            <p className="text-sm text-muted-foreground">
+              {t("auth.notMember")}{" "}
+              <button
+                onClick={() => setMode("signup")}
+                className="text-primary underline underline-offset-4"
+              >
+                {t("auth.askAccess")}
+              </button>
+            </p>
+            <button
+              onClick={async () => {
+                if (!form.email.trim()) {
+                  toast.error(t("auth.toast.needEmail"));
+                  return;
+                }
+                const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                });
+                if (error) toast.error(error.message);
+                else toast.success(t("auth.toast.resetSent"));
+              }}
+              className="mt-3 text-xs text-muted-foreground underline underline-offset-4"
+            >
+              {t("auth.forgot")}
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setMode("login")}
+            className="text-sm text-primary underline underline-offset-4"
+          >
+            ← {t("auth.backToLogin")}
+          </button>
+        )}
+      </div>
     </Shell>
   );
 }
@@ -246,13 +251,20 @@ function AuthPage() {
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
   const t = useT();
   return (
-    <div className="mx-auto max-w-md px-5 py-20">
-      <p className="eyebrow">{t("auth.eyebrow")}</p>
-      <h1 className="mt-3 mb-8 font-display text-4xl">{title}</h1>
-      {children}
+    <div className="mx-auto max-w-lg px-5 py-20">
+      <p className="eyebrow text-center">{t("auth.eyebrow")}</p>
+      <h1 className="mt-3 mb-8 text-center font-display text-4xl">{title}</h1>
+      <div className="border border-border bg-card/40 p-8 sm:p-10">{children}</div>
+      <p className="mt-4 text-center text-xs italic text-muted-foreground">
+        {t("auth.note")}{" "}
+        <Link to="/" className="underline underline-offset-4">
+          {t("auth.backToRegistry")}
+        </Link>
+      </p>
     </div>
   );
 }
+
 
 function Field({
   label,
