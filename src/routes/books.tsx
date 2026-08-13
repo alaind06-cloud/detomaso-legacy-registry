@@ -7,6 +7,13 @@ import type { Book } from "@/lib/types";
 
 const AUTHOR = "Philippe Olczyk";
 
+const REGISTER_URLS: Record<string, string> = {
+  bizzarrini: "https://registerbizzarrini.com",
+  "de-tomaso": "https://registerdetomaso.com",
+  "lancia-037": "https://registerlancia037.com",
+};
+
+
 
 export const Route = createFileRoute("/books")({
   head: () => ({
@@ -53,7 +60,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
 }
 
 
-function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
+function BookCard({ book, large = false, external = false }: { book: Book; large?: boolean; external?: boolean }) {
   const content = (
     <>
       <Cover book={book} large={large} />
@@ -61,8 +68,10 @@ function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
       <p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">{AUTHOR}</p>
     </>
   );
-  return book.lien_achat ? (
-    <a href={book.lien_achat} target="_blank" rel="noreferrer" className="group block">
+  const externalUrl = external && book.marque ? REGISTER_URLS[book.marque] : undefined;
+  const href = book.lien_achat ?? externalUrl;
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer" className="group block">
       {content}
     </a>
   ) : (
@@ -107,7 +116,7 @@ function Books() {
           <h2 className="eyebrow">{t("books.others")}</h2>
           <div className="mt-6 grid gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {others.map((b) => (
-              <BookCard key={b.id} book={b} />
+              <BookCard key={b.id} book={b} external />
             ))}
           </div>
         </section>
