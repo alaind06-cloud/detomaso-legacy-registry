@@ -7,6 +7,13 @@ import type { Book } from "@/lib/types";
 
 const AUTHOR = "Philippe Olczyk";
 
+const REGISTER_URLS: Record<string, string> = {
+  bizzarrini: "https://registerbizzarrini.com",
+  "de-tomaso": "https://registerdetomaso.com",
+  "lancia-037": "https://registerlancia037.com",
+};
+
+
 
 export const Route = createFileRoute("/books")({
   head: () => ({
