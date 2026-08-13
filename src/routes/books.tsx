@@ -60,7 +60,7 @@ function Cover({ book, large = false }: { book: Book; large?: boolean }) {
 }
 
 
-function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
+function BookCard({ book, large = false, external = false }: { book: Book; large?: boolean; external?: boolean }) {
   const content = (
     <>
       <Cover book={book} large={large} />
@@ -68,8 +68,10 @@ function BookCard({ book, large = false }: { book: Book; large?: boolean }) {
       <p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">{AUTHOR}</p>
     </>
   );
-  return book.lien_achat ? (
-    <a href={book.lien_achat} target="_blank" rel="noreferrer" className="group block">
+  const externalUrl = external && book.marque ? REGISTER_URLS[book.marque] : undefined;
+  const href = book.lien_achat ?? externalUrl;
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer" className="group block">
       {content}
     </a>
   ) : (
