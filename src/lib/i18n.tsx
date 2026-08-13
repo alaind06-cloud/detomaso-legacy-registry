@@ -144,6 +144,13 @@ const fr = {
   "auth.pending.text":
     "Votre compte est créé mais n'est pas encore validé par un administrateur. Les historiques détaillés des châssis seront accessibles dès validation.",
   "auth.signout": "Se déconnecter",
+  "auth.signupTitle": "Demande d'accès",
+  "auth.createAccount": "Créer un compte",
+  "auth.notMember": "Pas encore membre ?",
+  "auth.askAccess": "Demander l'accès",
+  "auth.backToLogin": "Retour à la connexion",
+  "auth.note": "Accès soumis à validation par l'expert.",
+  "auth.backToRegistry": "Retour au registre",
 
   "reset.eyebrow": "Sécurité",
   "reset.title": "Nouveau mot de passe",
@@ -336,6 +343,13 @@ const en: Dict = {
   "auth.pending.text":
     "Your account has been created but is not yet approved by an administrator. Detailed chassis histories will be accessible once approved.",
   "auth.signout": "Sign out",
+  "auth.signupTitle": "Access request",
+  "auth.createAccount": "Create account",
+  "auth.notMember": "Not a member yet?",
+  "auth.askAccess": "Request access",
+  "auth.backToLogin": "Back to sign in",
+  "auth.note": "Access subject to validation by the expert.",
+  "auth.backToRegistry": "Back to the register",
 
   "reset.eyebrow": "Security",
   "reset.title": "New password",
@@ -525,6 +539,13 @@ const it: Dict = {
   "auth.pending.text":
     "Il tuo account è stato creato ma non è ancora approvato da un amministratore. Le storie dettagliate dei telai saranno accessibili dopo l'approvazione.",
   "auth.signout": "Esci",
+  "auth.signupTitle": "Richiesta di accesso",
+  "auth.createAccount": "Crea un account",
+  "auth.notMember": "Non sei ancora membro?",
+  "auth.askAccess": "Richiedi l'accesso",
+  "auth.backToLogin": "Torna all'accesso",
+  "auth.note": "Accesso soggetto a convalida dell'esperto.",
+  "auth.backToRegistry": "Torna al registro",
 
   "reset.eyebrow": "Sicurezza",
   "reset.title": "Nuova password",
