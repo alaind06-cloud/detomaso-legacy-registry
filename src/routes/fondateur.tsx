@@ -7,53 +7,18 @@ const PORTRAIT_URL =
 
 const PERSON_JSONLD = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": "https://www.registerdetomaso.com/fondateur#person",
-  name: "Alejandro de Tomaso",
-  givenName: "Alejandro",
-  familyName: "de Tomaso",
-  url: "https://www.registerdetomaso.com/fondateur",
-  birthDate: "1928-07-10",
-  deathDate: "2003-05-21",
-  birthPlace: {
-    "@type": "Place",
-    address: { "@type": "PostalAddress", addressLocality: "Buenos Aires", addressCountry: "AR" },
+  "@type": "ProfilePage",
+  "headline": "Alejandro de Tomaso — fondateur de De Tomaso",
+  "author": {
+    "@type": "Organization",
+    "name": "De Tomaso Register",
   },
-  deathPlace: {
-    "@type": "Place",
-    address: { "@type": "PostalAddress", addressLocality: "Modena", addressCountry: "IT" },
+  "mainEntity": {
+    "@type": "Person",
+    "name": "Alejandro de Tomaso",
+    "jobTitle": "Founder & Constructor",
+    "sameAs": "https://www.wikidata.org/wiki/Q172234",
   },
-  nationality: [
-    { "@type": "Country", name: "Argentina" },
-    { "@type": "Country", name: "Italy" },
-  ],
-  jobTitle: ["Automotive Industry Executive", "Race Car Driver", "Entrepreneur"],
-  description:
-    "Alejandro de Tomaso (1928–2003) était un pilote de course, entrepreneur et constructeur automobile fondateur de De Tomaso Automobili à Modène. Il est célèbre pour la création des supercars Mangusta et Pantera, ainsi que le rachat de Maserati.",
-  image: PORTRAIT_URL,
-  sameAs: [
-    "https://fr.wikipedia.org/wiki/Alejandro_de_Tomaso",
-    "https://www.wikidata.org/wiki/Q172234",
-  ],
-  founder: [
-    {
-      "@type": "Organization",
-      name: "De Tomaso Automobili",
-      foundingDate: "1959",
-      location: {
-        "@type": "Place",
-        address: { "@type": "PostalAddress", addressLocality: "Modena", addressCountry: "IT" },
-      },
-    },
-  ],
-  knowsAbout: [
-    "De Tomaso Mangusta",
-    "De Tomaso Pantera",
-    "De Tomaso Vallelunga",
-    "Maserati Biturbo",
-    "Carrozzeria Ghia",
-    "Motor Valley Modena",
-  ],
 };
 
 const META_TITLE = `Alejandro de Tomaso : Le Visionnaire de Modène | ${BRAND.registerName}`;
