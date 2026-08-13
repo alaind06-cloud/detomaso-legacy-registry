@@ -207,3 +207,33 @@
     color-mix(in oklab, var(--color-background) 85%, transparent) 100%
   );
 }
+
+/* Rendu cinéma : grain argentique + bandes noires + étalonnage sépia froid */
+@utility hero-cine {
+  filter: grayscale(1) contrast(1.18) brightness(0.96) sepia(0.18);
+}
+
+@utility hero-grain {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  animation: hero-grain-shift 0.7s steps(2) infinite;
+}
+
+@keyframes hero-grain-shift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2%, 1%, 0);
+  }
+  100% {
+    transform: translate3d(1%, -2%, 0);
+  }
+}
+
+@utility hero-letterbox {
+  background:
+    linear-gradient(to bottom, oklch(0 0 0 / 0.9) 0 3.5%, transparent 3.5%),
+    linear-gradient(to top, oklch(0 0 0 / 0.9) 0 3.5%, transparent 3.5%);
+}
