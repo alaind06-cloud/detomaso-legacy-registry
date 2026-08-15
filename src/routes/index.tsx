@@ -2,9 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import heroAsset from "@/assets/hero-sport5000.png.asset.json";
 import { voituresQuery } from "@/lib/data";
 import { PhotoPicture } from "@/components/site/PhotoPicture";
+
 import { BRAND } from "@/lib/brand";
 import {
   PAGE_SIZE,
