@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AlejandroDeTomasoRouteImport } from './routes/alejandro-de-tomaso'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
-import { Route as FondateurRouteImport } from './routes/fondateur'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as VideosRouteImport } from './routes/videos'
@@ -29,6 +29,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlejandroDeTomasoRoute = AlejandroDeTomasoRouteImport.update({
+  id: '/alejandro-de-tomaso',
+  path: '/alejandro-de-tomaso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -37,11 +42,6 @@ const AuthRoute = AuthRouteImport.update({
 const BooksRoute = BooksRouteImport.update({
   id: '/books',
   path: '/books',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FondateurRoute = FondateurRouteImport.update({
-  id: '/fondateur',
-  path: '/fondateur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -68,9 +68,9 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
-  '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
@@ -79,9 +79,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
-  '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
@@ -91,9 +91,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
-  '/fondateur': typeof FondateurRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
@@ -104,9 +104,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
-    | '/fondateur'
     | '/reset-password'
     | '/sitemap.xml'
     | '/videos'
@@ -115,9 +115,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
-    | '/fondateur'
     | '/reset-password'
     | '/sitemap.xml'
     | '/videos'
@@ -126,9 +126,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
-    | '/fondateur'
     | '/reset-password'
     | '/sitemap.xml'
     | '/videos'
@@ -138,9 +138,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AlejandroDeTomasoRoute: typeof AlejandroDeTomasoRoute
   AuthRoute: typeof AuthRoute
   BooksRoute: typeof BooksRoute
-  FondateurRoute: typeof FondateurRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VideosRoute: typeof VideosRoute
@@ -163,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alejandro-de-tomaso': {
+      id: '/alejandro-de-tomaso'
+      path: '/alejandro-de-tomaso'
+      fullPath: '/alejandro-de-tomaso'
+      preLoaderRoute: typeof AlejandroDeTomasoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -175,13 +182,6 @@ declare module '@tanstack/react-router' {
       path: '/books'
       fullPath: '/books'
       preLoaderRoute: typeof BooksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fondateur': {
-      id: '/fondateur'
-      path: '/fondateur'
-      fullPath: '/fondateur'
-      preLoaderRoute: typeof FondateurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -218,9 +218,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AlejandroDeTomasoRoute: AlejandroDeTomasoRoute,
   AuthRoute: AuthRoute,
   BooksRoute: BooksRoute,
-  FondateurRoute: FondateurRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VideosRoute: VideosRoute,
