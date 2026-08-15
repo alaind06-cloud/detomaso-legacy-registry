@@ -121,14 +121,14 @@ function Home() {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden border-b border-border">
+      <section className="relative isolate overflow-hidden border-b border-border bg-black">
         <img
           src="/hero-sport5000.png"
           alt={t("home.heroAlt")}
           fetchPriority="high"
           decoding="sync"
-          className="hero-kenburns hero-cine absolute inset-0 size-full object-cover"
-          style={{ objectPosition: "center 45%" }}
+          className="hero-cine absolute inset-0 size-full object-cover"
+          style={{ objectPosition: "center 30%", transform: "scale(0.75)" }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
