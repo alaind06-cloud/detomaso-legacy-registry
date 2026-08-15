@@ -2,9 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import heroAsset from "@/assets/hero-sport5000.png.asset.json";
 import { voituresQuery } from "@/lib/data";
 import { PhotoPicture } from "@/components/site/PhotoPicture";
+
 import { BRAND } from "@/lib/brand";
 import {
   PAGE_SIZE,
@@ -123,12 +123,14 @@ function Home() {
     <>
       <section className="relative isolate overflow-hidden border-b border-border">
         <img
-          src={heroAsset.url}
+          src="/hero-sport5000.png"
           alt={t("home.heroAlt")}
           fetchPriority="high"
           decoding="sync"
-          className="hero-kenburns hero-cine absolute inset-0 size-full object-cover object-center"
+          className="hero-kenburns hero-cine absolute inset-0 size-full object-cover"
+          style={{ objectPosition: "center 45%" }}
         />
+
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/45" />
         <div className="hero-vignette pointer-events-none absolute inset-0" />
