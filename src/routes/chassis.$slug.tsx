@@ -195,7 +195,7 @@ function ChassisPage() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {t("chassis.provenance.text")}
               </p>
-              <Link to="/fondateur" className="mt-3 inline-block eyebrow text-primary hover:underline">
+              <Link to="/alejandro-de-tomaso" className="mt-3 inline-block eyebrow text-primary hover:underline">
                 {t("chassis.provenance.link")}
               </Link>
             </aside>

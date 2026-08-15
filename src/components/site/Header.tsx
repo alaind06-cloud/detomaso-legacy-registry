@@ -10,7 +10,7 @@ import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 
 const NAV: Array<{ to: string; key: TKey }> = [
   { to: "/", key: "nav.registry" },
-  { to: "/fondateur", key: "nav.founder" },
+  { to: "/alejandro-de-tomaso", key: "nav.founder" },
   { to: "/videos", key: "nav.videos" },
   { to: "/books", key: "nav.books" },
 ];

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AlejandroDeTomasoRouteImport } from './routes/alejandro-de-tomaso'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as FondateurRouteImport } from './routes/fondateur'
@@ -27,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlejandroDeTomasoRoute = AlejandroDeTomasoRouteImport.update({
+  id: '/alejandro-de-tomaso',
+  path: '/alejandro-de-tomaso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -68,6 +74,7 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alejandro-de-tomaso': typeof AlejandroDeTomasoRoute
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/fondateur': typeof FondateurRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
     | '/fondateur'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
     | '/fondateur'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/alejandro-de-tomaso'
     | '/auth'
     | '/books'
     | '/fondateur'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AlejandroDeTomasoRoute: typeof AlejandroDeTomasoRoute
   AuthRoute: typeof AuthRoute
   BooksRoute: typeof BooksRoute
   FondateurRoute: typeof FondateurRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alejandro-de-tomaso': {
+      id: '/alejandro-de-tomaso'
+      path: '/alejandro-de-tomaso'
+      fullPath: '/alejandro-de-tomaso'
+      preLoaderRoute: typeof AlejandroDeTomasoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AlejandroDeTomasoRoute: AlejandroDeTomasoRoute,
   AuthRoute: AuthRoute,
   BooksRoute: BooksRoute,
   FondateurRoute: FondateurRoute,
