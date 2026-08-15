@@ -25,7 +25,7 @@ const META_TITLE = `Alejandro de Tomaso : Le Visionnaire de Modène | ${BRAND.re
 const META_DESC =
   "Découvrez Alejandro de Tomaso (1928–2003), pilote et industriel argentin fondateur de De Tomaso Automobili à Modène, créateur de la Mangusta et de la Pantera, et repreneur de Maserati.";
 
-export const Route = createFileRoute("/fondateur")({
+export const Route = createFileRoute("/alejandro-de-tomaso")({
   head: () => ({
     meta: [
       { title: META_TITLE },

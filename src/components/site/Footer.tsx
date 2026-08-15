@@ -21,7 +21,7 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/fondateur" className="hover:text-foreground">
+              <Link to="/alejandro-de-tomaso" className="hover:text-foreground">
                 Alejandro de Tomaso
               </Link>
             </li>
