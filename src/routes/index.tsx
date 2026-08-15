@@ -123,12 +123,14 @@ function Home() {
     <>
       <section className="relative isolate overflow-hidden border-b border-border">
         <img
-          src={heroAsset.url}
+          src="/hero-sport5000.png"
           alt={t("home.heroAlt")}
           fetchPriority="high"
           decoding="sync"
-          className="hero-kenburns hero-cine absolute inset-0 size-full object-cover object-center"
+          className="hero-kenburns hero-cine absolute inset-0 size-full object-cover"
+          style={{ objectPosition: "center 45%" }}
         />
+
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/45" />
         <div className="hero-vignette pointer-events-none absolute inset-0" />
