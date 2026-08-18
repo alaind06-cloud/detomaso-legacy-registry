@@ -157,7 +157,10 @@ function AuthPage() {
                   const el = e.currentTarget;
                   if (el.validity.tooShort) {
                     el.setCustomValidity(
-                      t("auth.reason.tooShort", { min: String(MOTIVATION_MIN_LENGTH) })
+                      t("auth.reason.tooShort", {
+                        min: String(MOTIVATION_MIN_LENGTH),
+                        brand: BRAND.name,
+                      })
                     );
                   } else {
                     el.setCustomValidity("");
