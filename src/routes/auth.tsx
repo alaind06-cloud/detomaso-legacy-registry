@@ -52,6 +52,13 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (mode === "signup") {
+      const raisonTrim = form.raison.trim();
+      if (raisonTrim.length < MOTIVATION_MIN_LENGTH) {
+        toast.error(t("auth.reason.tooShort", { min: String(MOTIVATION_MIN_LENGTH) }));
+        return;
+      }
+    }
     setBusy(true);
     try {
       if (mode === "login") {
@@ -77,10 +84,7 @@ function AuthPage() {
             nom: form.nom.trim(),
             prenom: form.prenom.trim(),
             telephone: form.telephone.trim(),
-            raison:
-              form.raison === "Autre" && form.precision.trim()
-                ? `Autre — ${form.precision.trim()}`
-                : form.raison.trim(),
+            raison: form.raison.trim(),
             statut: "en_attente",
           });
           if (pErr) console.error(pErr);
