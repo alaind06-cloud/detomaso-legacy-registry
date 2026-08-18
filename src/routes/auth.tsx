@@ -40,7 +40,6 @@ function AuthPage() {
     prenom: "",
     telephone: "",
     raison: "",
-    precision: "",
   });
 
   useEffect(() => {
