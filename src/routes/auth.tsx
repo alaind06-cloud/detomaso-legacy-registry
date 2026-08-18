@@ -153,6 +153,17 @@ function AuthPage() {
               <textarea
                 value={form.raison}
                 onChange={(e) => set("raison", e.target.value)}
+                onInvalid={(e) => {
+                  const el = e.currentTarget;
+                  if (el.validity.tooShort) {
+                    el.setCustomValidity(
+                      t("auth.reason.tooShort", { min: String(MOTIVATION_MIN_LENGTH) })
+                    );
+                  } else {
+                    el.setCustomValidity("");
+                  }
+                }}
+                onInput={(e) => e.currentTarget.setCustomValidity("")}
                 rows={5}
                 required
                 minLength={MOTIVATION_MIN_LENGTH}
