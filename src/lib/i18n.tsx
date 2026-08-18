@@ -412,7 +412,14 @@ const en: Dict = {
   "founder.empire.e5": "Revival through volume: Biturbo, Quattroporte III, industrialised luxury.",
   "founder.empire.e6": "High-volume small cars (Mini Bertone, Daihatsu engines).",
 
+  "adminUnavailable.eyebrow": "Administration",
+  "adminUnavailable.title": "Panel not available here",
+  "adminUnavailable.text": "Register administration is now centralised on registerbizzarrini.com. Managers can access it directly there.",
+  "adminUnavailable.cta": "Open central administration",
+  "adminUnavailable.home": "Back to the register",
+
   "notFound.eyebrow": "Error 404",
+
   "notFound.title": "Chassis not found",
   "notFound.text": "This page does not exist or has been moved.",
   "notFound.cta": "Back to the register",
@@ -608,7 +615,14 @@ const it: Dict = {
   "founder.empire.e5": "Rilancio sui volumi: Biturbo, Quattroporte III, lusso industrializzato.",
   "founder.empire.e6": "Vetture piccole di grande serie (Mini Bertone, motori Daihatsu).",
 
+  "adminUnavailable.eyebrow": "Amministrazione",
+  "adminUnavailable.title": "Pannello non disponibile qui",
+  "adminUnavailable.text": "L'amministrazione dei registri è ora centralizzata su registerbizzarrini.com. I gestori possono accedervi direttamente.",
+  "adminUnavailable.cta": "Apri l'amministrazione centrale",
+  "adminUnavailable.home": "Torna al registro",
+
   "notFound.eyebrow": "Errore 404",
+
   "notFound.title": "Telaio non trovato",
   "notFound.text": "Questa pagina non esiste o è stata spostata.",
   "notFound.cta": "Torna al registro",
