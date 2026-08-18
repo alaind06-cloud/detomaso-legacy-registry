@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
-import { useT, type TKey } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
