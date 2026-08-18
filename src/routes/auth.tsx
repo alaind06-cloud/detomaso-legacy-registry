@@ -149,33 +149,21 @@ function AuthPage() {
               required
             />
             <label className="block">
-              <span className="eyebrow">{t("auth.reason")}</span>
-              <select
+              <span className="eyebrow">{t("auth.reason", { brand: BRAND.name })}</span>
+              <textarea
                 value={form.raison}
                 onChange={(e) => set("raison", e.target.value)}
+                rows={5}
                 required
-                className="mt-2 h-11 w-full border border-input bg-card px-3 text-sm outline-none focus:border-primary"
-              >
-                <option value="">{t("auth.reason.placeholder")}</option>
-                {RAISONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {t(r.key)}
-                  </option>
-                ))}
-              </select>
+                minLength={MOTIVATION_MIN_LENGTH}
+                maxLength={1000}
+                placeholder={t("auth.reason.placeholder", { brand: BRAND.name })}
+                className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
+              />
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {t("auth.reason.hint", { min: String(MOTIVATION_MIN_LENGTH) })}
+              </span>
             </label>
-            {form.raison === "Autre" && (
-              <label className="block">
-                <span className="eyebrow">{t("auth.precise")}</span>
-                <textarea
-                  value={form.precision}
-                  onChange={(e) => set("precision", e.target.value)}
-                  rows={4}
-                  maxLength={1000}
-                  className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
-                />
-              </label>
-            )}
           </>
         )}
         <Field
