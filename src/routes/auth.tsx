@@ -24,15 +24,7 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-/** Valeur stockée en base (FR, invariante) + clé de libellé traduit. */
-const RAISONS: Array<{ value: string; key: TKey }> = [
-  { value: "Propriétaire d'une De Tomaso", key: "auth.reason.owner" },
-  { value: "Ancien propriétaire", key: "auth.reason.former" },
-  { value: "Passionné / collectionneur", key: "auth.reason.enthusiast" },
-  { value: "Historien / chercheur", key: "auth.reason.historian" },
-  { value: "Professionnel de l'automobile", key: "auth.reason.pro" },
-  { value: "Autre", key: "auth.reason.other" },
-];
+const MOTIVATION_MIN_LENGTH = 30;
 
 function AuthPage() {
   const navigate = useNavigate();
