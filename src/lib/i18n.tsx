@@ -206,7 +206,14 @@ const fr = {
   "founder.empire.e5": "Relance par le volume : Biturbo, Quattroporte III, industrialisation du luxe.",
   "founder.empire.e6": "Petites voitures de grande série (Mini Bertone, moteurs Daihatsu).",
 
+  "adminUnavailable.eyebrow": "Administration",
+  "adminUnavailable.title": "Panneau non disponible ici",
+  "adminUnavailable.text": "L'administration des registres est centralisée sur registerbizzarrini.com. Les gestionnaires peuvent y accéder directement.",
+  "adminUnavailable.cta": "Ouvrir l'administration centrale",
+  "adminUnavailable.home": "Retour au registre",
+
   "notFound.eyebrow": "Erreur 404",
+
   "notFound.title": "Châssis introuvable",
   "notFound.text": "Cette page n'existe pas ou a été déplacée.",
   "notFound.cta": "Retour au registre",
