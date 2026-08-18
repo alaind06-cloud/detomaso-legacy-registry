@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
-import { useT, type TKey } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -24,15 +24,7 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-/** Valeur stockée en base (FR, invariante) + clé de libellé traduit. */
-const RAISONS: Array<{ value: string; key: TKey }> = [
-  { value: "Propriétaire d'une De Tomaso", key: "auth.reason.owner" },
-  { value: "Ancien propriétaire", key: "auth.reason.former" },
-  { value: "Passionné / collectionneur", key: "auth.reason.enthusiast" },
-  { value: "Historien / chercheur", key: "auth.reason.historian" },
-  { value: "Professionnel de l'automobile", key: "auth.reason.pro" },
-  { value: "Autre", key: "auth.reason.other" },
-];
+const MOTIVATION_MIN_LENGTH = 30;
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -48,7 +40,6 @@ function AuthPage() {
     prenom: "",
     telephone: "",
     raison: "",
-    precision: "",
   });
 
   useEffect(() => {
@@ -61,6 +52,13 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (mode === "signup") {
+      const raisonTrim = form.raison.trim();
+      if (raisonTrim.length < MOTIVATION_MIN_LENGTH) {
+        toast.error(t("auth.reason.tooShort", { min: String(MOTIVATION_MIN_LENGTH) }));
+        return;
+      }
+    }
     setBusy(true);
     try {
       if (mode === "login") {
@@ -86,10 +84,7 @@ function AuthPage() {
             nom: form.nom.trim(),
             prenom: form.prenom.trim(),
             telephone: form.telephone.trim(),
-            raison:
-              form.raison === "Autre" && form.precision.trim()
-                ? `Autre — ${form.precision.trim()}`
-                : form.raison.trim(),
+            raison: form.raison.trim(),
             statut: "en_attente",
           });
           if (pErr) console.error(pErr);
@@ -154,33 +149,35 @@ function AuthPage() {
               required
             />
             <label className="block">
-              <span className="eyebrow">{t("auth.reason")}</span>
-              <select
+              <span className="eyebrow">{t("auth.reason", { brand: BRAND.name })}</span>
+              <textarea
                 value={form.raison}
                 onChange={(e) => set("raison", e.target.value)}
+                onInvalid={(e) => {
+                  const el = e.currentTarget;
+                  if (el.validity.tooShort) {
+                    el.setCustomValidity(
+                      t("auth.reason.tooShort", {
+                        min: String(MOTIVATION_MIN_LENGTH),
+                        brand: BRAND.name,
+                      })
+                    );
+                  } else {
+                    el.setCustomValidity("");
+                  }
+                }}
+                onInput={(e) => e.currentTarget.setCustomValidity("")}
+                rows={5}
                 required
-                className="mt-2 h-11 w-full border border-input bg-card px-3 text-sm outline-none focus:border-primary"
-              >
-                <option value="">{t("auth.reason.placeholder")}</option>
-                {RAISONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {t(r.key)}
-                  </option>
-                ))}
-              </select>
+                minLength={MOTIVATION_MIN_LENGTH}
+                maxLength={1000}
+                placeholder={t("auth.reason.placeholder", { brand: BRAND.name })}
+                className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
+              />
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {t("auth.reason.hint", { min: String(MOTIVATION_MIN_LENGTH) })}
+              </span>
             </label>
-            {form.raison === "Autre" && (
-              <label className="block">
-                <span className="eyebrow">{t("auth.precise")}</span>
-                <textarea
-                  value={form.precision}
-                  onChange={(e) => set("precision", e.target.value)}
-                  rows={4}
-                  maxLength={1000}
-                  className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
-                />
-              </label>
-            )}
           </>
         )}
         <Field
