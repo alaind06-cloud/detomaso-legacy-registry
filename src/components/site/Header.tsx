@@ -16,7 +16,7 @@ const NAV: Array<{ to: string; key: TKey }> = [
 ];
 
 export function Header() {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const t = useT();
 
@@ -44,11 +44,6 @@ export function Header() {
 
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
-          {isAdmin && (
-            <Link to="/admin" className="eyebrow hover:text-foreground">
-              {t("nav.admin")}
-            </Link>
-          )}
           {user ? (
             <button
               onClick={async () => {
@@ -68,6 +63,7 @@ export function Header() {
             </Link>
           )}
         </div>
+
 
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
