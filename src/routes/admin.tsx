@@ -190,12 +190,13 @@ function AdminPage() {
         <>
           <div className="mt-10 grid grid-cols-1 border border-border sm:grid-cols-3">
             {tabs.map(({ statut, label, icon: Icon }, index) => (
-              <button
+              <Button
                 key={statut}
                 type="button"
+                variant="ghost"
                 onClick={() => setFiltre(statut)}
                 aria-pressed={filtre === statut}
-                className={`flex min-h-24 items-center justify-between px-5 py-4 text-left transition-colors ${
+                className={`h-auto min-h-24 justify-between rounded-none px-5 py-4 text-left shadow-none ${
                   index > 0 ? "border-t border-border sm:border-l sm:border-t-0" : ""
                 } ${filtre === statut ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"}`}
               >
@@ -204,7 +205,7 @@ function AdminPage() {
                   <span className="mt-1 block font-display text-3xl">{counts[statut]}</span>
                 </span>
                 <Icon className="h-5 w-5" aria-hidden="true" />
-              </button>
+              </Button>
             ))}
           </div>
 
