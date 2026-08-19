@@ -222,7 +222,7 @@ function AuthPage() {
                   return;
                 }
                 const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
-                  redirectTo: `${window.location.origin}/reset-password`,
+                  redirectTo: `${BRAND.siteUrl}/reset-password`,
                 });
                 if (error) toast.error(error.message);
                 else toast.success(t("auth.toast.resetSent"));
