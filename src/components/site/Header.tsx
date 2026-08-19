@@ -16,7 +16,7 @@ const NAV: Array<{ to: string; key: TKey }> = [
 ];
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, isMember } = useAuth();
   const [open, setOpen] = useState(false);
   const t = useT();
 
@@ -45,15 +45,25 @@ export function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
           {user ? (
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = "/";
-              }}
-              className="border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent"
-            >
-              {t("nav.logout")}
-            </button>
+            <>
+              {!isMember && (
+                <Link
+                  to="/auth"
+                  className="bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  {t("nav.requestAccess")}
+                </Link>
+              )}
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = "/";
+                }}
+                className="border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent"
+              >
+                {t("nav.logout")}
+              </button>
+            </>
           ) : (
             <Link
               to="/auth"
@@ -65,16 +75,18 @@ export function Header() {
         </div>
 
 
+
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
-          {!user && (
+          {(!user || !isMember) && (
             <Link
               to="/auth"
               className="bg-primary px-3.5 py-2 text-[10px] uppercase tracking-[0.16em] text-primary-foreground"
             >
-              {t("nav.member")}
+              {user ? t("nav.requestAccess") : t("nav.member")}
             </Link>
           )}
+
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label={t("nav.menu")}
