@@ -272,8 +272,7 @@ export function RequestAccessPanel() {
     if (!user) return;
     setBusy(true);
     try {
-      await upsertProfil({ id: user.id, email: user.email ?? "", raison });
-      await ensureAccessRequest(user.id, raison);
+      await submitAccessRequest({ userId: user.id, email: user.email ?? "", raison });
       toast.success(t("auth.request.sent"));
       await refresh();
     } catch (err) {
