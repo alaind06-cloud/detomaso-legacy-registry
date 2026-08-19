@@ -116,6 +116,12 @@ export function Header() {
               {t(n.key)}
             </Link>
           ))}
+          {isAdmin && (
+            <Link to="/admin" onClick={() => setOpen(false)} className="py-2.5 text-sm">
+              {t("nav.admin")}
+            </Link>
+          )}
+
           {user ? (
             <button
               onClick={async () => {
