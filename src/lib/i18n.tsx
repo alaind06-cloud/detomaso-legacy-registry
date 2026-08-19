@@ -543,6 +543,11 @@ const it: Dict = {
   "auth.notMember": "Non sei ancora membro?",
   "auth.askAccess": "Richiedi l'accesso",
   "auth.backToLogin": "Torna all'accesso",
+  "auth.request.title": "Richiedi l'accesso a {brand}",
+  "auth.request.intro": "Il tuo account è attivo ma non hai ancora una richiesta approvata per questo registro.",
+  "auth.request.submit": "Invia la richiesta",
+  "auth.request.sent": "Richiesta inviata, in attesa di convalida.",
+  "nav.requestAccess": "Richiedi l'accesso",
   "auth.note": "Accesso soggetto a convalida dell'esperto.",
   "auth.backToRegistry": "Torna al registro",
 
