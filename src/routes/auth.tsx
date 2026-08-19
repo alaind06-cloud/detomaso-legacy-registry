@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
-import { ensureAccessRequest, upsertProfil } from "@/lib/access";
+import { submitAccessRequest } from "@/lib/access";
 import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
@@ -76,33 +76,29 @@ function AuthPage() {
           password: form.password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { marque: BRAND_SLUG },
+            data: {
+              marque: BRAND_SLUG,
+              nom: form.nom.trim(),
+              prenom: form.prenom.trim(),
+              telephone: form.telephone.trim(),
+              raison: form.raison.trim(),
+            },
           },
         });
         if (error) throw error;
-        if (data.user) {
-          // Le profil (identité) et la demande d'accès (statut par marque)
-          // sont deux enregistrements distincts : l'admin lit demandes_acces.
-          try {
-            await upsertProfil({
-              id: data.user.id,
-              email: form.email,
-              nom: form.nom,
-              prenom: form.prenom,
-              telephone: form.telephone,
-              raison: form.raison,
-            });
-          } catch (pErr) {
-            console.error("profils:", (pErr as Error).message);
-          }
-          try {
-            await ensureAccessRequest(data.user.id, form.raison);
-          } catch (dErr) {
-            console.error("demandes_acces:", (dErr as Error).message);
-            toast.error((dErr as Error).message);
-          }
-          await refresh();
-        }
+        if (!data.user) throw new Error("Compte non créé, merci de réessayer.");
+        // Profil + demande d'accès sont écrits côté serveur : sans session
+        // (confirmation e-mail requise), une écriture client serait bloquée
+        // par RLS et la demande n'apparaîtrait jamais dans /admin.
+        await submitAccessRequest({
+          userId: data.user.id,
+          email: form.email,
+          nom: form.nom,
+          prenom: form.prenom,
+          telephone: form.telephone,
+          raison: form.raison,
+        });
+        await refresh();
         setSent(true);
       }
 
@@ -282,8 +278,7 @@ export function RequestAccessPanel() {
     if (!user) return;
     setBusy(true);
     try {
-      await upsertProfil({ id: user.id, email: user.email ?? "", raison });
-      await ensureAccessRequest(user.id, raison);
+      await submitAccessRequest({ userId: user.id, email: user.email ?? "", raison });
       toast.success(t("auth.request.sent"));
       await refresh();
     } catch (err) {
