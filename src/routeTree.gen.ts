@@ -19,6 +19,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
+import { Route as ApiPublicRegisterAccessRouteImport } from './routes/api/public/register-access'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
   path: '/chassis/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRegisterAccessRoute = ApiPublicRegisterAccessRouteImport.update({
+  id: '/api/public/register-access',
+  path: '/api/public/register-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/register-access'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/register-access'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/register-access'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VideosRoute: typeof VideosRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
+  ApiPublicRegisterAccessRoute: typeof ApiPublicRegisterAccessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChassisSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/register-access': {
+      id: '/api/public/register-access'
+      path: '/api/public/register-access'
+      fullPath: '/api/public/register-access'
+      preLoaderRoute: typeof ApiPublicRegisterAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VideosRoute: VideosRoute,
   ChassisSlugRoute: ChassisSlugRoute,
+  ApiPublicRegisterAccessRoute: ApiPublicRegisterAccessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
