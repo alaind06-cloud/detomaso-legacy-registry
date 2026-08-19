@@ -16,9 +16,10 @@ const NAV: Array<{ to: string; key: TKey }> = [
 ];
 
 export function Header() {
-  const { user, isMember } = useAuth();
+  const { user, isMember, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const t = useT();
+
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
