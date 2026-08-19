@@ -1,91 +1,32 @@
-import { supabase } from "@/integrations/supabase/client";
 import { BRAND_SLUG } from "@/lib/brand";
+import { registerAccessRequest } from "@/lib/access.functions";
 
 /**
- * Crée (ou met à jour) la demande d'accès de l'utilisateur pour la marque du site.
- * Idempotent : si une demande existe déjà pour ce couple (user_id, marque),
- * on ne crée pas de doublon.
- * - demande déjà "valide" : on ne touche à rien.
- * - demande "en_attente"/"refuse" : on met à jour la motivation et on repasse
- *   le statut en "en_attente".
+ * Crée (ou met à jour) le profil ET la demande d'accès pour la marque du site.
+ *
+ * L'écriture passe par une fonction serveur : après `auth.signUp`, la session
+ * peut être absente (confirmation e-mail obligatoire) et RLS bloquerait alors
+ * toute écriture client. Le serveur vérifie l'existence du compte avant
+ * d'écrire, et l'opération est idempotente (aucun doublon possible :
+ * `demandes_acces` a une clé primaire (user_id, marque)).
  */
-export async function ensureAccessRequest(userId: string, raison: string) {
-  const motivation = raison.trim();
-
-  const { data: existing, error: selErr } = await supabase
-    .from("demandes_acces")
-    .select("id, statut")
-    .eq("user_id", userId)
-    .eq("marque", BRAND_SLUG)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (selErr) throw new Error(selErr.message);
-
-  const current = existing?.[0] as { id: number | string; statut: string | null } | undefined;
-
-  if (current) {
-    if (current.statut === "valide") return { created: false, updated: false };
-    const { error } = await supabase
-      .from("demandes_acces")
-      .update({ raison: motivation, statut: "en_attente" })
-      .eq("id", current.id);
-    if (error) throw new Error(error.message);
-    return { created: false, updated: true };
-  }
-
-  const { error } = await supabase.from("demandes_acces").insert({
-    user_id: userId,
-    marque: BRAND_SLUG,
-    raison: motivation,
-    statut: "en_attente",
-  });
-  if (error) throw new Error(error.message);
-  return { created: true, updated: false };
-}
-
-/**
- * Crée le profil s'il n'existe pas, sinon met à jour uniquement les champs
- * d'identité (jamais le statut ni les droits admin déjà en base).
- */
-export async function upsertProfil(input: {
-  id: string;
+export async function submitAccessRequest(input: {
+  userId: string;
   email: string;
+  raison: string;
   nom?: string;
   prenom?: string;
   telephone?: string;
-  raison?: string;
 }) {
-  // On n'écrase jamais une valeur existante avec une chaîne vide.
-  const identity: Record<string, string> = {};
-  const put = (k: string, v?: string) => {
-    const val = v?.trim();
-    if (val) identity[k] = val;
-  };
-  put("email", input.email);
-  put("nom", input.nom);
-  put("prenom", input.prenom);
-  put("telephone", input.telephone);
-  put("raison", input.raison);
-
-  const { data: existing, error: selErr } = await supabase
-    .from("profils")
-    .select("id")
-    .eq("id", input.id)
-    .limit(1);
-  if (selErr) throw new Error(selErr.message);
-
-  if (existing && existing.length > 0) {
-    if (Object.keys(identity).length === 0) return;
-    const { error } = await supabase.from("profils").update(identity).eq("id", input.id);
-    if (error) throw new Error(error.message);
-    return;
-  }
-
-
-  const { error } = await supabase
-    .from("profils")
-    .insert({ id: input.id, marque: BRAND_SLUG, statut: "en_attente", ...identity });
-  if (error) throw new Error(error.message);
+  return registerAccessRequest({
+    data: {
+      userId: input.userId,
+      email: input.email.trim(),
+      marque: BRAND_SLUG,
+      raison: input.raison,
+      nom: input.nom ?? "",
+      prenom: input.prenom ?? "",
+      telephone: input.telephone ?? "",
+    },
+  });
 }
-
