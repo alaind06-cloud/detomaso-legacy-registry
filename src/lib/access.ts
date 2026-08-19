@@ -44,7 +44,10 @@ export async function ensureAccessRequest(userId: string, raison: string) {
   return { created: true, updated: false };
 }
 
-/** Crée ou met à jour le profil (identité du membre), sans écraser une ligne existante. */
+/**
+ * Crée le profil s'il n'existe pas, sinon met à jour uniquement les champs
+ * d'identité (jamais le statut ni les droits admin déjà en base).
+ */
 export async function upsertProfil(input: {
   id: string;
   email: string;
@@ -53,18 +56,30 @@ export async function upsertProfil(input: {
   telephone?: string;
   raison?: string;
 }) {
-  const { error } = await supabase.from("profils").upsert(
-    {
-      id: input.id,
-      marque: BRAND_SLUG,
-      email: input.email.trim(),
-      nom: input.nom?.trim() ?? "",
-      prenom: input.prenom?.trim() ?? "",
-      telephone: input.telephone?.trim() ?? "",
-      raison: input.raison?.trim() ?? "",
-      statut: "en_attente",
-    },
-    { onConflict: "id" }
-  );
+  const identity = {
+    email: input.email.trim(),
+    nom: input.nom?.trim() ?? "",
+    prenom: input.prenom?.trim() ?? "",
+    telephone: input.telephone?.trim() ?? "",
+    raison: input.raison?.trim() ?? "",
+  };
+
+  const { data: existing, error: selErr } = await supabase
+    .from("profils")
+    .select("id")
+    .eq("id", input.id)
+    .limit(1);
+  if (selErr) throw new Error(selErr.message);
+
+  if (existing && existing.length > 0) {
+    const { error } = await supabase.from("profils").update(identity).eq("id", input.id);
+    if (error) throw new Error(error.message);
+    return;
+  }
+
+  const { error } = await supabase
+    .from("profils")
+    .insert({ id: input.id, marque: BRAND_SLUG, statut: "en_attente", ...identity });
   if (error) throw new Error(error.message);
 }
+
