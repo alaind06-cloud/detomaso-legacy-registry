@@ -45,15 +45,25 @@ export function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
           {user ? (
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = "/";
-              }}
-              className="border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent"
-            >
-              {t("nav.logout")}
-            </button>
+            <>
+              {!isMember && (
+                <Link
+                  to="/auth"
+                  className="bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  {t("nav.requestAccess")}
+                </Link>
+              )}
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = "/";
+                }}
+                className="border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-accent"
+              >
+                {t("nav.logout")}
+              </button>
+            </>
           ) : (
             <Link
               to="/auth"
@@ -63,6 +73,7 @@ export function Header() {
             </Link>
           )}
         </div>
+
 
 
         <div className="flex items-center gap-3 md:hidden">
