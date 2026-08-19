@@ -76,7 +76,13 @@ function AuthPage() {
           password: form.password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { marque: BRAND_SLUG },
+            data: {
+              marque: BRAND_SLUG,
+              nom: form.nom.trim(),
+              prenom: form.prenom.trim(),
+              telephone: form.telephone.trim(),
+              raison: form.raison.trim(),
+            },
           },
         });
         if (error) throw error;
