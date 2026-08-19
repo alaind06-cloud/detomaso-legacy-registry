@@ -56,13 +56,17 @@ export async function upsertProfil(input: {
   telephone?: string;
   raison?: string;
 }) {
-  const identity = {
-    email: input.email.trim(),
-    nom: input.nom?.trim() ?? "",
-    prenom: input.prenom?.trim() ?? "",
-    telephone: input.telephone?.trim() ?? "",
-    raison: input.raison?.trim() ?? "",
+  // On n'écrase jamais une valeur existante avec une chaîne vide.
+  const identity: Record<string, string> = {};
+  const put = (k: string, v?: string) => {
+    const val = v?.trim();
+    if (val) identity[k] = val;
   };
+  put("email", input.email);
+  put("nom", input.nom);
+  put("prenom", input.prenom);
+  put("telephone", input.telephone);
+  put("raison", input.raison);
 
   const { data: existing, error: selErr } = await supabase
     .from("profils")
@@ -72,10 +76,12 @@ export async function upsertProfil(input: {
   if (selErr) throw new Error(selErr.message);
 
   if (existing && existing.length > 0) {
+    if (Object.keys(identity).length === 0) return;
     const { error } = await supabase.from("profils").update(identity).eq("id", input.id);
     if (error) throw new Error(error.message);
     return;
   }
+
 
   const { error } = await supabase
     .from("profils")
