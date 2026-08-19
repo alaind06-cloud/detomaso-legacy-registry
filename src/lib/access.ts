@@ -1,14 +1,13 @@
 import { BRAND_SLUG } from "@/lib/brand";
-import { registerAccessRequest } from "@/lib/access.functions";
 
 /**
  * Crée (ou met à jour) le profil ET la demande d'accès pour la marque du site.
  *
- * L'écriture passe par une fonction serveur : après `auth.signUp`, la session
- * peut être absente (confirmation e-mail obligatoire) et RLS bloquerait alors
- * toute écriture client. Le serveur vérifie l'existence du compte avant
- * d'écrire, et l'opération est idempotente (aucun doublon possible :
- * `demandes_acces` a une clé primaire (user_id, marque)).
+ * L'écriture passe par l'endpoint serveur `/api/public/register-access` :
+ * après `auth.signUp`, la session peut être absente (confirmation e-mail
+ * obligatoire) et RLS bloquerait alors toute écriture depuis le navigateur.
+ * Le serveur vérifie l'existence du compte avant d'écrire, et l'opération est
+ * idempotente (`demandes_acces` a une clé primaire (user_id, marque)).
  */
 export async function submitAccessRequest(input: {
   userId: string;
@@ -18,8 +17,10 @@ export async function submitAccessRequest(input: {
   prenom?: string;
   telephone?: string;
 }) {
-  return registerAccessRequest({
-    data: {
+  const res = await fetch("/api/public/register-access", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
       userId: input.userId,
       email: input.email.trim(),
       marque: BRAND_SLUG,
@@ -27,6 +28,15 @@ export async function submitAccessRequest(input: {
       nom: input.nom ?? "",
       prenom: input.prenom ?? "",
       telephone: input.telephone ?? "",
-    },
+    }),
   });
+
+  let body: { statut?: string; created?: boolean; error?: string } = {};
+  try {
+    body = (await res.json()) as typeof body;
+  } catch {
+    /* réponse non JSON */
+  }
+  if (!res.ok) throw new Error(body.error ?? `Erreur serveur (${res.status}).`);
+  return body;
 }
