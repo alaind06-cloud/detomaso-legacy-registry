@@ -34,7 +34,7 @@ type DemandeAvecProfil = DemandeRow & { profil: Profil | null };
 type StatutFiltre = "en_attente" | "valide" | "refuse";
 
 const ADMIN_DECISION_PATH = "/api/public/admin-access-decision";
-const LOVABLE_BACKEND_URL = "https://detomaso-legacy-registry.lovable.app";
+const LOVABLE_BACKEND_URL = "https://id-preview--561a914c-f1bd-417e-9b36-a553d17436f5.lovable.app";
 
 function demandesQueryKey() {
   return ["admin-demandes", BRAND_SLUG] as const;
