@@ -34,7 +34,6 @@ type DemandeAvecProfil = DemandeRow & { profil: Profil | null };
 type StatutFiltre = "en_attente" | "valide" | "refuse";
 
 const ADMIN_DECISION_PATH = "/api/public/admin-access-decision";
-const LOVABLE_BACKEND_URL = "https://detomaso-legacy-registry.lovable.app";
 
 function demandesQueryKey() {
   return ["admin-demandes", BRAND_SLUG] as const;
@@ -103,10 +102,7 @@ function AdminPage() {
         return { res, body };
       };
 
-      let result = await request(ADMIN_DECISION_PATH);
-      if (result.res.status === 500 && result.body.error === "Configuration serveur incomplète.") {
-        result = await request(`${LOVABLE_BACKEND_URL}${ADMIN_DECISION_PATH}`);
-      }
+      const result = await request(ADMIN_DECISION_PATH);
       if (!result.res.ok) throw new Error(result.body.error ?? `Erreur serveur (${result.res.status}).`);
     },
     onMutate: async ({ userId, statut }) => {
