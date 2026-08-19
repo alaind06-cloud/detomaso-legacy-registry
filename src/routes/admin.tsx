@@ -109,11 +109,21 @@ function AdminPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16">
-      <p className="eyebrow">Administration — {BRAND.name}</p>
-      <h1 className="mt-3 font-display text-4xl">Demandes d'accès</h1>
-      <p className="mt-3 text-sm text-muted-foreground">
-        {rows.length} demande(s) pour ce registre · {enAttente} en attente
-      </p>
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="eyebrow">Administration — {BRAND.name}</p>
+          <h1 className="mt-3 font-display text-4xl">Demandes d'accès</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {rows.length} demande(s) pour ce registre · {enAttente} en attente
+          </p>
+        </div>
+        <Link
+          to="/"
+          className="inline-flex items-center justify-center border border-border px-5 py-3 text-xs uppercase tracking-[0.14em] transition-colors hover:bg-muted/50"
+        >
+          ← Retour au registre
+        </Link>
+      </div>
 
       {isLoading && <p className="mt-10 text-sm text-muted-foreground">Chargement des demandes…</p>}
       {error && <p className="mt-10 text-sm text-destructive">{(error as Error).message}</p>}
