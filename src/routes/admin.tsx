@@ -141,6 +141,9 @@ function AdminPage() {
 
       {isLoading && <p className="mt-10 text-sm text-muted-foreground">Chargement des demandes…</p>}
       {error && <p className="mt-10 text-sm text-destructive">{(error as Error).message}</p>}
+      {setStatut.error && (
+        <p className="mt-6 text-sm text-destructive">{(setStatut.error as Error).message}</p>
+      )}
 
       {!isLoading && !error && (
         <div className="mt-10 overflow-x-auto border border-border">
