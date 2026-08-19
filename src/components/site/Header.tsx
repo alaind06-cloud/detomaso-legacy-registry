@@ -67,7 +67,20 @@ export function Header() {
 
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
-          <button onClick={() => setOpen((o) => !o)} aria-label={t("nav.menu")}>
+          {!user && (
+            <Link
+              to="/auth"
+              className="bg-primary px-3.5 py-2 text-[10px] uppercase tracking-[0.16em] text-primary-foreground"
+            >
+              {t("nav.member")}
+            </Link>
+          )}
+          <button
+            onClick={() => setOpen((o) => !o)}
+            aria-label={t("nav.menu")}
+            aria-expanded={open}
+            className="p-1"
+          >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
@@ -80,11 +93,25 @@ export function Header() {
               {t(n.key)}
             </Link>
           ))}
-          <Link to="/auth" onClick={() => setOpen(false)} className="py-2.5 text-sm text-primary">
-            {t("nav.member")}
-          </Link>
+          {user ? (
+            <button
+              onClick={async () => {
+                setOpen(false);
+                await supabase.auth.signOut();
+                window.location.href = "/";
+              }}
+              className="py-2.5 text-left text-sm text-primary"
+            >
+              {t("nav.logout")}
+            </button>
+          ) : (
+            <Link to="/auth" onClick={() => setOpen(false)} className="py-2.5 text-sm text-primary">
+              {t("nav.member")}
+            </Link>
+          )}
         </nav>
       </div>
+
     </header>
   );
 }
