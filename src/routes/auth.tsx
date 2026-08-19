@@ -73,7 +73,10 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: form.email.trim(),
           password: form.password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { marque: BRAND_SLUG },
+          },
         });
         if (error) throw error;
         if (data.user) {
