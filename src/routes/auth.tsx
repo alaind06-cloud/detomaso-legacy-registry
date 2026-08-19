@@ -236,6 +236,97 @@ function AuthPage() {
   );
 }
 
+export function RequestAccessPanel() {
+  const t = useT();
+  const { user, demande, refresh } = useAuth();
+  const [raison, setRaison] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const pending = !!demande && demande.statut !== "valide";
+
+  if (pending) {
+    return (
+      <Shell title={t("auth.pending.title")}>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t("auth.pending.text")}</p>
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            await refresh();
+          }}
+          className="mt-6 border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em]"
+        >
+          {t("auth.signout")}
+        </button>
+      </Shell>
+    );
+  }
+
+  async function submitRequest(e: React.FormEvent) {
+    e.preventDefault();
+    if (raison.trim().length < MOTIVATION_MIN_LENGTH) {
+      toast.error(t("auth.reason.tooShort", { min: String(MOTIVATION_MIN_LENGTH), brand: BRAND.name }));
+      return;
+    }
+    if (!user) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("demandes_acces").insert({
+        user_id: user.id,
+        marque: BRAND_SLUG,
+        raison: raison.trim(),
+      });
+      if (error) throw error;
+      toast.success(t("auth.request.sent"));
+      await refresh();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Shell title={t("auth.request.title", { brand: BRAND.name })}>
+      <p className="mb-6 text-sm leading-relaxed text-muted-foreground">{t("auth.request.intro")}</p>
+      <form onSubmit={submitRequest} className="space-y-5">
+        <label className="block">
+          <span className="eyebrow">{t("auth.reason", { brand: BRAND.name })}</span>
+          <textarea
+            value={raison}
+            onChange={(e) => setRaison(e.target.value)}
+            rows={5}
+            required
+            minLength={MOTIVATION_MIN_LENGTH}
+            maxLength={1000}
+            placeholder={t("auth.reason.placeholder", { brand: BRAND.name })}
+            className="mt-2 w-full border border-input bg-card p-3 text-sm outline-none focus:border-primary"
+          />
+          <span className="mt-1 block text-xs text-muted-foreground">
+            {t("auth.reason.hint", { min: String(MOTIVATION_MIN_LENGTH) })}
+          </span>
+        </label>
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+        >
+          {busy ? "…" : t("auth.request.submit")}
+        </button>
+      </form>
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          await refresh();
+        }}
+        className="mt-6 text-xs uppercase tracking-[0.18em] text-muted-foreground underline underline-offset-4"
+      >
+        {t("auth.signout")}
+      </button>
+    </Shell>
+  );
+}
+
+
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
   const t = useT();
   return (
