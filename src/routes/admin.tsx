@@ -1,9 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Check, CheckCircle2, Clock3, RotateCcw, UserRoundCheck, UserRoundX, X } from "lucide-react";
+import { toast } from "sonner";
 import { BRAND, BRAND_SLUG } from "@/lib/brand";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Profil } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -25,6 +29,9 @@ interface DemandeRow {
   statut: string | null;
   created_at: string | null;
 }
+
+type DemandeAvecProfil = DemandeRow & { profil: Profil | null };
+type StatutFiltre = "en_attente" | "valide" | "refuse";
 
 function demandesQueryKey() {
   return ["admin-demandes", BRAND_SLUG] as const;
@@ -59,6 +66,7 @@ const STATUT_LABEL: Record<string, string> = {
 function AdminPage() {
   const { loading, user, isAdmin } = useAuth();
   const qc = useQueryClient();
+  const [filtre, setFiltre] = useState<StatutFiltre>("en_attente");
 
   const { data, isLoading, error } = useQuery({
     queryKey: demandesQueryKey(),
@@ -70,7 +78,11 @@ function AdminPage() {
     mutationFn: async ({ userId, statut }: { userId: string; statut: string }) => {
       // `demandes_acces` a une clé primaire composite (user_id, marque) : pas de colonne `id`.
       // L'écriture passe par un endpoint serveur qui revérifie le rôle admin (service_role serveur).
-      const { data: sess } = await supabase.auth.getSession();
+      let { data: sess } = await supabase.auth.getSession();
+      if (!sess.session?.access_token) {
+        const refreshed = await supabase.auth.refreshSession();
+        sess = refreshed.data;
+      }
       const token = sess.session?.access_token;
       if (!token) throw new Error("Session expirée, reconnectez-vous.");
       const res = await fetch("/api/public/admin-access-decision", {
@@ -86,7 +98,24 @@ function AdminPage() {
       }
       if (!res.ok) throw new Error(body.error ?? `Erreur serveur (${res.status}).`);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: demandesQueryKey() }),
+    onMutate: async ({ userId, statut }) => {
+      await qc.cancelQueries({ queryKey: demandesQueryKey() });
+      const previous = qc.getQueryData<DemandeAvecProfil[]>(demandesQueryKey());
+      qc.setQueryData<DemandeAvecProfil[]>(demandesQueryKey(), (current) =>
+        current?.map((row) => (row.user_id === userId ? { ...row, statut } : row)),
+      );
+      return { previous };
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(variables.statut === "valide" ? "Accès validé" : "Demande refusée");
+    },
+    onError: (mutationError, _variables, context) => {
+      if (context?.previous) qc.setQueryData(demandesQueryKey(), context.previous);
+      toast.error((mutationError as Error).message);
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: demandesQueryKey() });
+    },
   });
 
   if (loading) {
@@ -119,7 +148,17 @@ function AdminPage() {
   }
 
   const rows = data ?? [];
-  const enAttente = rows.filter((r) => (r.statut ?? "en_attente") === "en_attente").length;
+  const counts: Record<StatutFiltre, number> = {
+    en_attente: rows.filter((r) => (r.statut ?? "en_attente") === "en_attente").length,
+    valide: rows.filter((r) => r.statut === "valide").length,
+    refuse: rows.filter((r) => r.statut === "refuse").length,
+  };
+  const filteredRows = rows.filter((r) => (r.statut ?? "en_attente") === filtre);
+  const tabs: Array<{ statut: StatutFiltre; label: string; icon: typeof Clock3 }> = [
+    { statut: "en_attente", label: "En attente", icon: Clock3 },
+    { statut: "valide", label: "Validés", icon: UserRoundCheck },
+    { statut: "refuse", label: "Refusés", icon: UserRoundX },
+  ];
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16">
@@ -128,7 +167,7 @@ function AdminPage() {
           <p className="eyebrow">Administration — {BRAND.name}</p>
           <h1 className="mt-3 font-display text-4xl">Demandes d'accès</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            {rows.length} demande(s) pour ce registre · {enAttente} en attente
+            Gérez les accès au registre {BRAND.name} depuis une vue unique.
           </p>
         </div>
         <Link
@@ -142,11 +181,52 @@ function AdminPage() {
       {isLoading && <p className="mt-10 text-sm text-muted-foreground">Chargement des demandes…</p>}
       {error && <p className="mt-10 text-sm text-destructive">{(error as Error).message}</p>}
       {setStatut.error && (
-        <p className="mt-6 text-sm text-destructive">{(setStatut.error as Error).message}</p>
+        <p role="alert" className="mt-6 border-l-2 border-destructive pl-3 text-sm text-destructive">
+          {(setStatut.error as Error).message}
+        </p>
       )}
 
       {!isLoading && !error && (
-        <div className="mt-10 overflow-x-auto border border-border">
+        <>
+          <div className="mt-10 grid grid-cols-1 border border-border sm:grid-cols-3">
+            {tabs.map(({ statut, label, icon: Icon }, index) => (
+              <Button
+                key={statut}
+                type="button"
+                variant="ghost"
+                onClick={() => setFiltre(statut)}
+                aria-pressed={filtre === statut}
+                className={`h-auto min-h-24 justify-between rounded-none px-5 py-4 text-left shadow-none ${
+                  index > 0 ? "border-t border-border sm:border-l sm:border-t-0" : ""
+                } ${filtre === statut ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"}`}
+              >
+                <span>
+                  <span className="block text-xs uppercase tracking-[0.14em] opacity-70">{label}</span>
+                  <span className="mt-1 block font-display text-3xl">{counts[statut]}</span>
+                </span>
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            ))}
+          </div>
+
+          <div className="mt-6 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">{tabs.find((tab) => tab.statut === filtre)?.label}</h2>
+              <p className="mt-1 text-xs text-muted-foreground">{filteredRows.length} compte(s)</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void qc.invalidateQueries({ queryKey: demandesQueryKey() })}
+              disabled={setStatut.isPending}
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Actualiser
+            </Button>
+          </div>
+
+        <div className="mt-4 overflow-x-auto border border-border">
           <table className="w-full min-w-[860px] text-left text-sm">
             <thead className="bg-muted/50 text-xs uppercase tracking-[0.14em] text-muted-foreground">
               <tr>
@@ -159,8 +239,9 @@ function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const statut = r.statut ?? "en_attente";
+                const isCurrent = setStatut.isPending && setStatut.variables?.userId === r.user_id;
                 return (
                   <tr key={r.user_id} className="border-t border-border align-top">
                     <td className="px-4 py-4">
@@ -177,41 +258,48 @@ function AdminPage() {
                       {r.created_at ? new Date(r.created_at).toLocaleDateString("fr-FR") : "—"}
                     </td>
                     <td className="px-4 py-4">
-                      <span className="border border-border px-2 py-1 text-xs uppercase tracking-[0.14em]">
+                      <span className="inline-flex items-center gap-1.5 border border-border px-2 py-1 text-xs uppercase tracking-[0.14em]">
+                        {statut === "valide" ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
                         {STATUT_LABEL[statut] ?? statut}
                       </span>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-end gap-2">
-                        <button
-                          disabled={statut === "valide" || setStatut.isPending}
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={statut === "valide" || isCurrent}
                           onClick={() => setStatut.mutate({ userId: r.user_id, statut: "valide" })}
-                          className="bg-primary px-3 py-2 text-xs uppercase tracking-[0.14em] text-primary-foreground disabled:opacity-40"
                         >
-                          Valider
-                        </button>
-                        <button
-                          disabled={statut === "refuse" || setStatut.isPending}
+                          <Check className="h-4 w-4" aria-hidden="true" />
+                          {isCurrent && setStatut.variables?.statut === "valide" ? "Validation…" : "Valider"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={statut === "refuse" || isCurrent}
                           onClick={() => setStatut.mutate({ userId: r.user_id, statut: "refuse" })}
-                          className="border border-border px-3 py-2 text-xs uppercase tracking-[0.14em] disabled:opacity-40"
                         >
-                          Refuser
-                        </button>
+                          <X className="h-4 w-4" aria-hidden="true" />
+                          {isCurrent && setStatut.variables?.statut === "refuse" ? "Refus…" : "Refuser"}
+                        </Button>
                       </div>
                     </td>
                   </tr>
                 );
               })}
-              {rows.length === 0 && (
+              {filteredRows.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
-                    Aucune demande pour ce registre.
+                    Aucun compte dans cette catégorie.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   );
