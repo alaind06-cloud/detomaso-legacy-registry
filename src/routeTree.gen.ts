@@ -19,6 +19,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ChassisSlugRouteImport } from './routes/chassis.$slug'
+import { Route as ApiPublicAdminAccessDecisionRouteImport } from './routes/api/public/admin-access-decision'
 import { Route as ApiPublicRegisterAccessRouteImport } from './routes/api/public/register-access'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,12 @@ const ChassisSlugRoute = ChassisSlugRouteImport.update({
   path: '/chassis/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminAccessDecisionRoute =
+  ApiPublicAdminAccessDecisionRouteImport.update({
+    id: '/api/public/admin-access-decision',
+    path: '/api/public/admin-access-decision',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicRegisterAccessRoute = ApiPublicRegisterAccessRouteImport.update({
   id: '/api/public/register-access',
   path: '/api/public/register-access',
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/admin-access-decision': typeof ApiPublicAdminAccessDecisionRoute
   '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/admin-access-decision': typeof ApiPublicAdminAccessDecisionRoute
   '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRoutesById {
@@ -115,6 +124,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/videos': typeof VideosRoute
   '/chassis/$slug': typeof ChassisSlugRoute
+  '/api/public/admin-access-decision': typeof ApiPublicAdminAccessDecisionRoute
   '/api/public/register-access': typeof ApiPublicRegisterAccessRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/admin-access-decision'
     | '/api/public/register-access'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/admin-access-decision'
     | '/api/public/register-access'
   id:
     | '__root__'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/videos'
     | '/chassis/$slug'
+    | '/api/public/admin-access-decision'
     | '/api/public/register-access'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +183,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VideosRoute: typeof VideosRoute
   ChassisSlugRoute: typeof ChassisSlugRoute
+  ApiPublicAdminAccessDecisionRoute: typeof ApiPublicAdminAccessDecisionRoute
   ApiPublicRegisterAccessRoute: typeof ApiPublicRegisterAccessRoute
 }
 
@@ -245,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChassisSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin-access-decision': {
+      id: '/api/public/admin-access-decision'
+      path: '/api/public/admin-access-decision'
+      fullPath: '/api/public/admin-access-decision'
+      preLoaderRoute: typeof ApiPublicAdminAccessDecisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/register-access': {
       id: '/api/public/register-access'
       path: '/api/public/register-access'
@@ -266,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VideosRoute: VideosRoute,
   ChassisSlugRoute: ChassisSlugRoute,
+  ApiPublicAdminAccessDecisionRoute: ApiPublicAdminAccessDecisionRoute,
   ApiPublicRegisterAccessRoute: ApiPublicRegisterAccessRoute,
 }
 export const routeTree = rootRouteImport

@@ -19,7 +19,6 @@ export const Route = createFileRoute("/admin")({
 });
 
 interface DemandeRow {
-  id: number | string;
   user_id: string;
   marque: string;
   raison: string | null;
@@ -68,9 +67,24 @@ function AdminPage() {
   });
 
   const setStatut = useMutation({
-    mutationFn: async ({ id, statut }: { id: number | string; statut: string }) => {
-      const { error: e } = await supabase.from("demandes_acces").update({ statut }).eq("id", id);
-      if (e) throw new Error(e.message);
+    mutationFn: async ({ userId, statut }: { userId: string; statut: string }) => {
+      // `demandes_acces` a une clé primaire composite (user_id, marque) : pas de colonne `id`.
+      // L'écriture passe par un endpoint serveur qui revérifie le rôle admin (service_role serveur).
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) throw new Error("Session expirée, reconnectez-vous.");
+      const res = await fetch("/api/public/admin-access-decision", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId, marque: BRAND_SLUG, statut }),
+      });
+      let body: { error?: string } = {};
+      try {
+        body = (await res.json()) as typeof body;
+      } catch {
+        /* réponse non JSON */
+      }
+      if (!res.ok) throw new Error(body.error ?? `Erreur serveur (${res.status}).`);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: demandesQueryKey() }),
   });
@@ -127,6 +141,9 @@ function AdminPage() {
 
       {isLoading && <p className="mt-10 text-sm text-muted-foreground">Chargement des demandes…</p>}
       {error && <p className="mt-10 text-sm text-destructive">{(error as Error).message}</p>}
+      {setStatut.error && (
+        <p className="mt-6 text-sm text-destructive">{(setStatut.error as Error).message}</p>
+      )}
 
       {!isLoading && !error && (
         <div className="mt-10 overflow-x-auto border border-border">
@@ -145,7 +162,7 @@ function AdminPage() {
               {rows.map((r) => {
                 const statut = r.statut ?? "en_attente";
                 return (
-                  <tr key={String(r.id)} className="border-t border-border align-top">
+                  <tr key={r.user_id} className="border-t border-border align-top">
                     <td className="px-4 py-4">
                       <span className="font-medium">
                         {[r.profil?.prenom, r.profil?.nom].filter(Boolean).join(" ") || "—"}
@@ -168,14 +185,14 @@ function AdminPage() {
                       <div className="flex justify-end gap-2">
                         <button
                           disabled={statut === "valide" || setStatut.isPending}
-                          onClick={() => setStatut.mutate({ id: r.id, statut: "valide" })}
+                          onClick={() => setStatut.mutate({ userId: r.user_id, statut: "valide" })}
                           className="bg-primary px-3 py-2 text-xs uppercase tracking-[0.14em] text-primary-foreground disabled:opacity-40"
                         >
                           Valider
                         </button>
                         <button
                           disabled={statut === "refuse" || setStatut.isPending}
-                          onClick={() => setStatut.mutate({ id: r.id, statut: "refuse" })}
+                          onClick={() => setStatut.mutate({ userId: r.user_id, statut: "refuse" })}
                           className="border border-border px-3 py-2 text-xs uppercase tracking-[0.14em] disabled:opacity-40"
                         >
                           Refuser
