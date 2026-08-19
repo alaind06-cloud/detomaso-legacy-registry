@@ -16,9 +16,10 @@ const NAV: Array<{ to: string; key: TKey }> = [
 ];
 
 export function Header() {
-  const { user, isMember } = useAuth();
+  const { user, isMember, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const t = useT();
+
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -40,7 +41,17 @@ export function Header() {
               {t(n.key)}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="relative text-sm tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "text-foreground" }}
+            >
+              {t("nav.admin")}
+            </Link>
+          )}
         </nav>
+
 
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
@@ -105,6 +116,12 @@ export function Header() {
               {t(n.key)}
             </Link>
           ))}
+          {isAdmin && (
+            <Link to="/admin" onClick={() => setOpen(false)} className="py-2.5 text-sm">
+              {t("nav.admin")}
+            </Link>
+          )}
+
           {user ? (
             <button
               onClick={async () => {
