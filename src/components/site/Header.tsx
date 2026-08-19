@@ -78,14 +78,15 @@ export function Header() {
 
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
-          {!user && (
+          {(!user || !isMember) && (
             <Link
               to="/auth"
               className="bg-primary px-3.5 py-2 text-[10px] uppercase tracking-[0.16em] text-primary-foreground"
             >
-              {t("nav.member")}
+              {user ? t("nav.requestAccess") : t("nav.member")}
             </Link>
           )}
+
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label={t("nav.menu")}
