@@ -80,29 +80,19 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        if (data.user) {
-          // Le profil (identité) et la demande d'accès (statut par marque)
-          // sont deux enregistrements distincts : l'admin lit demandes_acces.
-          try {
-            await upsertProfil({
-              id: data.user.id,
-              email: form.email,
-              nom: form.nom,
-              prenom: form.prenom,
-              telephone: form.telephone,
-              raison: form.raison,
-            });
-          } catch (pErr) {
-            console.error("profils:", (pErr as Error).message);
-          }
-          try {
-            await ensureAccessRequest(data.user.id, form.raison);
-          } catch (dErr) {
-            console.error("demandes_acces:", (dErr as Error).message);
-            toast.error((dErr as Error).message);
-          }
-          await refresh();
-        }
+        if (!data.user) throw new Error("Compte non créé, merci de réessayer.");
+        // Profil + demande d'accès sont écrits côté serveur : sans session
+        // (confirmation e-mail requise), une écriture client serait bloquée
+        // par RLS et la demande n'apparaîtrait jamais dans /admin.
+        await submitAccessRequest({
+          userId: data.user.id,
+          email: form.email,
+          nom: form.nom,
+          prenom: form.prenom,
+          telephone: form.telephone,
+          raison: form.raison,
+        });
+        await refresh();
         setSent(true);
       }
 
