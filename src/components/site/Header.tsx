@@ -41,7 +41,17 @@ export function Header() {
               {t(n.key)}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="relative text-sm tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "text-foreground" }}
+            >
+              {t("nav.admin")}
+            </Link>
+          )}
         </nav>
+
 
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
