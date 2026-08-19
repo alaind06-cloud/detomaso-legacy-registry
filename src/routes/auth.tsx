@@ -80,20 +80,31 @@ function AuthPage() {
         });
         if (error) throw error;
         if (data.user) {
-          const { error: pErr } = await supabase.from("profils").insert({
-            id: data.user.id,
-            marque: BRAND_SLUG,
-            email: form.email.trim(),
-            nom: form.nom.trim(),
-            prenom: form.prenom.trim(),
-            telephone: form.telephone.trim(),
-            raison: form.raison.trim(),
-            statut: "en_attente",
-          });
-          if (pErr) console.error(pErr);
+          // Le profil (identité) et la demande d'accès (statut par marque)
+          // sont deux enregistrements distincts : l'admin lit demandes_acces.
+          try {
+            await upsertProfil({
+              id: data.user.id,
+              email: form.email,
+              nom: form.nom,
+              prenom: form.prenom,
+              telephone: form.telephone,
+              raison: form.raison,
+            });
+          } catch (pErr) {
+            console.error("profils:", (pErr as Error).message);
+          }
+          try {
+            await ensureAccessRequest(data.user.id, form.raison);
+          } catch (dErr) {
+            console.error("demandes_acces:", (dErr as Error).message);
+            toast.error((dErr as Error).message);
+          }
+          await refresh();
         }
         setSent(true);
       }
+
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
