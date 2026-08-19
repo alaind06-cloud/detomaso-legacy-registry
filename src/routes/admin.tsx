@@ -33,6 +33,8 @@ interface DemandeRow {
 type DemandeAvecProfil = DemandeRow & { profil: Profil | null };
 type StatutFiltre = "en_attente" | "valide" | "refuse";
 
+const ADMIN_DECISION_PATH = "/api/public/admin-access-decision";
+
 function demandesQueryKey() {
   return ["admin-demandes", BRAND_SLUG] as const;
 }
@@ -85,18 +87,23 @@ function AdminPage() {
       }
       const token = sess.session?.access_token;
       if (!token) throw new Error("Session expirée, reconnectez-vous.");
-      const res = await fetch("/api/public/admin-access-decision", {
-        method: "POST",
-        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-        body: JSON.stringify({ userId, marque: BRAND_SLUG, statut }),
-      });
-      let body: { error?: string } = {};
-      try {
-        body = (await res.json()) as typeof body;
-      } catch {
-        /* réponse non JSON */
-      }
-      if (!res.ok) throw new Error(body.error ?? `Erreur serveur (${res.status}).`);
+      const request = async (url: string) => {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+          body: JSON.stringify({ userId, marque: BRAND_SLUG, statut }),
+        });
+        let body: { error?: string } = {};
+        try {
+          body = (await res.json()) as typeof body;
+        } catch {
+          /* réponse non JSON */
+        }
+        return { res, body };
+      };
+
+      const result = await request(ADMIN_DECISION_PATH);
+      if (!result.res.ok) throw new Error(result.body.error ?? `Erreur serveur (${result.res.status}).`);
     },
     onMutate: async ({ userId, statut }) => {
       await qc.cancelQueries({ queryKey: demandesQueryKey() });
