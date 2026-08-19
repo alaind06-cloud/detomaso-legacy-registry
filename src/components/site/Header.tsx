@@ -16,7 +16,7 @@ const NAV: Array<{ to: string; key: TKey }> = [
 ];
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, isMember } = useAuth();
   const [open, setOpen] = useState(false);
   const t = useT();
 
