@@ -28,7 +28,7 @@ const MOTIVATION_MIN_LENGTH = 30;
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, profil, isMember, refresh } = useAuth();
+  const { user, isMember, refresh } = useAuth();
   const t = useT();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
