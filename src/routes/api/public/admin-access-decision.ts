@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "@/integrations/supabase/client";
+import { BRAND_SLUG } from "@/lib/brand";
 
 /**
  * Validation / refus d'une demande d'accès, côté serveur.
@@ -17,8 +18,7 @@ import { SUPABASE_URL } from "@/integrations/supabase/client";
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const MARQUE = /^[a-z0-9-]{2,40}$/;
-const STATUTS = new Set(["valide", "refuse", "en_attente"]);
+const STATUTS = new Set(["valide", "refuse"]);
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/api/public/admin-access-decision")({
         const statut = str("statut").trim();
 
         if (!UUID.test(userId)) return json({ error: "Identifiant utilisateur invalide." }, 400);
-        if (!MARQUE.test(marque)) return json({ error: "Marque invalide." }, 400);
+        if (marque !== BRAND_SLUG) return json({ error: "Marque invalide." }, 400);
         if (!STATUTS.has(statut)) return json({ error: "Statut invalide." }, 400);
 
         const serviceKey =
@@ -85,16 +85,19 @@ export const Route = createFileRoute("/api/public/admin-access-decision")({
         if (uErr) return json({ error: uErr.message }, 500);
         if (!updated || updated.length === 0) return json({ error: "Demande introuvable." }, 404);
 
-        // 4. Aligner le profil quand il appartient à cette marque.
+        // 4. Aligner le profil hérité quand il appartient à cette marque.
+        // demandes_acces reste la source de vérité : un éventuel échec de cette
+        // synchronisation secondaire ne doit pas transformer une décision déjà
+        // enregistrée en erreur visible côté administrateur.
         const { data: profil, error: pErr } = await admin
           .from("profils")
           .select("id, marque")
           .eq("id", userId)
           .maybeSingle();
-        if (pErr) return json({ error: pErr.message }, 500);
+        if (pErr) console.error("admin-access-decision: lecture du profil", pErr.message);
         if (profil && profil.marque === marque) {
           const { error } = await admin.from("profils").update({ statut }).eq("id", userId);
-          if (error) return json({ error: error.message }, 500);
+          if (error) console.error("admin-access-decision: synchronisation du profil", error.message);
         }
 
         return json({ statut, ok: true });
