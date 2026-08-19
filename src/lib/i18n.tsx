@@ -144,6 +144,11 @@ const fr = {
   "auth.notMember": "Pas encore membre ?",
   "auth.askAccess": "Demander l'accès",
   "auth.backToLogin": "Retour à la connexion",
+  "auth.request.title": "Demander l'accès à {brand}",
+  "auth.request.intro": "Votre compte est actif mais vous n'avez pas encore de demande validée pour ce registre.",
+  "auth.request.submit": "Envoyer la demande",
+  "auth.request.sent": "Demande envoyée, en attente de validation.",
+  "nav.requestAccess": "Demander l'accès",
   "auth.note": "Accès soumis à validation par l'expert.",
   "auth.backToRegistry": "Retour au registre",
 
