@@ -109,22 +109,10 @@ function AuthPage() {
     );
   }
 
-  if (user && profil && !isMember) {
-    return (
-      <Shell title={t("auth.pending.title")}>
-        <p className="text-sm leading-relaxed text-muted-foreground">{t("auth.pending.text")}</p>
-        <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            await refresh();
-          }}
-          className="mt-6 border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em]"
-        >
-          {t("auth.signout")}
-        </button>
-      </Shell>
-    );
+  if (user && !isMember) {
+    return <RequestAccessPanel />;
   }
+
 
   return (
     <Shell title={mode === "login" ? t("auth.login") : t("auth.signupTitle")}>
