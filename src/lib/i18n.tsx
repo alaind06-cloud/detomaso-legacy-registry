@@ -345,6 +345,11 @@ const en: Dict = {
   "auth.notMember": "Not a member yet?",
   "auth.askAccess": "Request access",
   "auth.backToLogin": "Back to sign in",
+  "auth.request.title": "Request access to {brand}",
+  "auth.request.intro": "Your account is active but you do not have an approved request for this register yet.",
+  "auth.request.submit": "Send the request",
+  "auth.request.sent": "Request sent, pending validation.",
+  "nav.requestAccess": "Request access",
   "auth.note": "Access subject to validation by the expert.",
   "auth.backToRegistry": "Back to the register",
 
